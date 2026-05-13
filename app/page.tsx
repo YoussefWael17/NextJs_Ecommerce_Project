@@ -1,65 +1,108 @@
 import Image from "next/image";
+// import { EmblaCarousel } from "./components/slider";
+import HeroSection from "./components/hero-section";
+import FlashSale from "./components/flash-sale";
+import CategoriesSlider from "./components/categories-slider";
+import BestSelling from "./components/best-selling";
+import FeaturedProducts from "./components/featured-products";
+import ProductCard from "./components/product-card";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div>
+      {/* <EmblaCarousel /> */}
+      <HeroSection />
+      <FlashSale />
+      <CategoriesSlider />
+      <BestSelling />
+
+      <div className="w-full py-16">
+        <div className="mx-auto max-w-screen-xl px-4">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 bg-black rounded-lg overflow-hidden">
+
+            {/* LEFT SIDE */}
+            <div className="p-10 flex flex-col justify-center text-white">
+
+              <p className="text-[#00FF66] font-semibold mb-3">
+                Categories
+              </p>
+
+              <h2 className="text-3xl md:text-4xl font-bold leading-tight">
+                Enhance Your <br /> Music Experience
+              </h2>
+
+              {/* COUNTDOWN */}
+              <div className="flex gap-4 mt-8 flex-wrap">
+
+                <div className="bg-white text-black rounded-full w-16 h-16 flex flex-col items-center justify-center">
+                  <span className="text-lg font-bold">23</span>
+                  <span className="text-xs">Hours</span>
+                </div>
+
+                <div className="bg-white text-black rounded-full w-16 h-16 flex flex-col items-center justify-center">
+                  <span className="text-lg font-bold">05</span>
+                  <span className="text-xs">Days</span>
+                </div>
+
+                <div className="bg-white text-black rounded-full w-16 h-16 flex flex-col items-center justify-center">
+                  <span className="text-lg font-bold">59</span>
+                  <span className="text-xs">Minutes</span>
+                </div>
+
+                <div className="bg-white text-black rounded-full w-16 h-16 flex flex-col items-center justify-center">
+                  <span className="text-lg font-bold">35</span>
+                  <span className="text-xs">Seconds</span>
+                </div>
+
+              </div>
+
+              {/* BUTTON */}
+              <button className="mt-8 bg-[#00FF66] hover:bg-red-600 transition text-white px-8 py-3 rounded-md w-fit">
+                Buy Now
+              </button>
+
+            </div>
+
+            {/* RIGHT SIDE */}
+            <div className="relative flex items-center justify-center bg-black">
+
+              <div className="relative flex items-center justify-center bg-black">
+
+              {/* WHITE GLOW */}
+              <div className="absolute w-[350px] h-[350px] bg-white/20 blur-3xl rounded-full"></div>
+
+              {/* SECOND SOFT LAYER (optional for depth) */}
+              <div className="absolute w-[250px] h-[250px] bg-white/10 blur-2xl rounded-full"></div>
+
+              {/* IMAGE */}
+              <img
+                src="https://www.pngmart.com/files/7/Bluetooth-Speaker-PNG-Image.png"
+                // src="https://pngimg.com/uploads/headphones/headphones_PNG101975.png"
+                className="relative z-10 h-[320px] object-contain drop-shadow-[0_0_40px_rgba(255,255,255,0.25)]"
+                alt="headphones"
+              />
+
+            </div>
+
+            </div>
+
+          </div>
+
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
+
+      <FeaturedProducts />
+
+      {/* <div className="flex mx-auto w-full max-w-screen-xl overflow-hidden">
+        <ProductCard />
+        <ProductCard />
+        <ProductCard />
+        <ProductCard />
+        <ProductCard />
+      </div> */}
+
+
     </div>
   );
 }
