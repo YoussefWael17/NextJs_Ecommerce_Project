@@ -22,6 +22,8 @@ export default function ProductDetails() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
     {
       id: 2,
@@ -30,6 +32,8 @@ export default function ProductDetails() {
       category: "Phones",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
     {
       id: 3,
@@ -38,6 +42,8 @@ export default function ProductDetails() {
       category: "Watches",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
     {
       id: 4,
@@ -46,10 +52,10 @@ export default function ProductDetails() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
   ];
-
-  const offer:boolean = false;
 
   const images = [
     "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
@@ -274,7 +280,7 @@ export default function ProductDetails() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
 
           {products.map((product) => (
-            <ProductCard key={product.id} isOffer={offer} product={product} />
+            <ProductCard key={product.id} product={product} />
           ))}
 
         </div>

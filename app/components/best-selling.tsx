@@ -12,6 +12,8 @@ export default function BestSelling() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
     {
       id: 2,
@@ -20,6 +22,8 @@ export default function BestSelling() {
       category: "Phones",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
     {
       id: 3,
@@ -28,6 +32,8 @@ export default function BestSelling() {
       category: "Watches",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
     {
       id: 4,
@@ -36,6 +42,8 @@ export default function BestSelling() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
     {
       id: 5,
@@ -44,6 +52,8 @@ export default function BestSelling() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
     {
       id: 6,
@@ -52,10 +62,13 @@ export default function BestSelling() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: false,
+      isAdded: false
     },
   ];
 
   const offer:boolean = false;
+  const isAdded:boolean = false;
 
   return (
     <div className="flex w-full items-center">
@@ -90,7 +103,7 @@ export default function BestSelling() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
           {products.map((product) => (
-            <ProductCard key={product.id} isOffer={offer} product={product} />
+            <ProductCard key={product.id} product={product} />
           ))}
 
         </div>

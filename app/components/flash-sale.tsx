@@ -47,6 +47,8 @@ export default function FlashSale() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: true,
+      isAdded: false
     },
     {
       id: 2,
@@ -55,6 +57,8 @@ export default function FlashSale() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: true,
+      isAdded: false
     },
     {
       id: 3,
@@ -63,6 +67,8 @@ export default function FlashSale() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: true,
+      isAdded: false
     },
     {
       id: 4,
@@ -71,6 +77,8 @@ export default function FlashSale() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: true,
+      isAdded: false
     },
     {
       id: 5,
@@ -79,6 +87,8 @@ export default function FlashSale() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: true,
+      isAdded: false
     },
     {
       id: 6,
@@ -87,9 +97,10 @@ export default function FlashSale() {
       category: "Gaming",
       price: 120,
       discount: 240,
+      isOffered: true,
+      isAdded: false
     },
   ];
-  const offer:boolean = true;
 
   return (
     <div className="flex min-h-screen w-full items-center mb-10">
@@ -172,7 +183,7 @@ export default function FlashSale() {
           <div className="flex">
 
             {products.map((product) => (
-              <ProductCard key={product.id} isOffer={offer} product={product} />
+              <ProductCard key={product.id} product={product} />
             ))}
 
           </div>
