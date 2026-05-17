@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import React from 'react'
+import { FaTimes } from 'react-icons/fa'
 
 export default function CartPage() {
 
@@ -67,23 +68,44 @@ export default function CartPage() {
             className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center bg-white rounded-xl shadow-sm border border-gray-100 px-6 py-5">
 
             {/* PRODUCT */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 group relative">
+
+              {/* IMAGE */}
+              <div className="relative">
+
                 <img
-                src={item.image}
-                alt={item.name}
-                className="w-14 h-14 rounded-xl object-contain"
+                  src={item.image}
+                  alt={item.name}
+                  className="w-14 h-14 rounded-xl object-contain"
                 />
 
-                <div>
-                    <h2 className="text-[16px] text-black">
-                        {item.name}
-                    </h2>
+                {/* REMOVE BUTTON */}
+                {/* <button
+                  className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-[#DB4444] text-white text-xs 
+                  flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300"
+                >
+                  ×
+                </button> */}
+                <button
+                  className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-[#DB4444] text-white 
+                  flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
+                >
+                  <FaTimes className="text-[12px]" />
+                </button>
+
+              </div>
+
+              {/* PRODUCT INFO */}
+              <div>
+                <h2 className="text-[16px] text-black">
+                  {item.name}
+                </h2>
 
                 {/* <p className="text-sm text-gray-500 mt-1">
-                    {item.color}
+                  {item.color}
                 </p> */}
+              </div>
 
-                </div>
             </div>
 
             {/* PRICE */}
@@ -94,7 +116,7 @@ export default function CartPage() {
             {/* QUANTITY */}
             <div className="flex justify-center">
                 <div className="flex items-center border rounded-xl overflow-hidden">
-                <button className="px-4 py-2 text-lg hover:bg-gray-100 transition">
+                <button className="px-4 py-2 text-lg hover:bg-[#DB4444] hover:text-white transition duration-300">
                     -
                 </button>
 
@@ -102,7 +124,7 @@ export default function CartPage() {
                     {item.quantity}
                 </span>
 
-                <button className="px-4 py-2 text-lg hover:bg-gray-100 transition">
+                <button className="px-4 py-2 text-lg hover:bg-[#DB4444] hover:text-white transition duration-300">
                     +
                 </button>
                 </div>
