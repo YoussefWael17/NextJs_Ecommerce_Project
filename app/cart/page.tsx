@@ -80,12 +80,6 @@ export default function CartPage() {
                 />
 
                 {/* REMOVE BUTTON */}
-                {/* <button
-                  className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-[#DB4444] text-white text-xs 
-                  flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300"
-                >
-                  ×
-                </button> */}
                 <button
                   className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-[#DB4444] text-white 
                   flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
