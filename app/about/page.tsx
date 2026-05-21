@@ -1,6 +1,8 @@
 import React from 'react'
 import AboutSection from '../components/about-section'
 import Link from 'next/link'
+import StatsSection from '../components/stats-section'
+import TeamSection from '../components/team-section'
 
 export default function AboutPage() {
   return (
@@ -22,6 +24,8 @@ export default function AboutPage() {
         </div>
 
     <AboutSection />
+    <StatsSection />
+    <TeamSection />
     </div>
   )
 }
