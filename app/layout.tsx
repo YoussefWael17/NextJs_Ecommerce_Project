@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
+import Navbar from "./components/navbar";
+import Footer from "./components/footer";
 
 config.autoAddCss = false;
 
@@ -31,7 +33,23 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+
+        <div className="flex min-h-screen flex-col">
+          {/* Navbar */}
+          <Navbar />
+
+          {/* Page Content */}
+          <main className="flex-1">
+            {children}
+          </main>
+
+          {/* Footer */}
+          <Footer />
+        </div>
+
+        {/* {children} */}
+      </body>
     </html>
   );
 }

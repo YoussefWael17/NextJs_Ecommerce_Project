@@ -2,7 +2,7 @@ import React from "react";
 
 export default function ProfilePage() {
   return (
-    <div className="mx-auto max-w-4xl py-10 px-20 shadow-md">
+    <div className="mx-auto max-w-4xl px-2 md:px-20 py-10 shadow-md">
       <div className="bg-white">
         <h1 className="mb-4 text-[20px] font-medium text-[#DB4444]">
           Edit Your Profile
