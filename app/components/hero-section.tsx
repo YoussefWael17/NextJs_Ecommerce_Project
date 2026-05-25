@@ -59,8 +59,8 @@ export default function HeroSection() {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="bg-white py-10 px-4 md:px-8">
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+    <section className="bg-white mt-28 mb-10">
+      <div className="w-full max-w-7xl px-6 mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
 
         {/* Categories */}
         <div className="border-b lg:border-b-0 lg:border-r border-gray-300 pb-6 lg:pb-0 lg:pr-6">
@@ -157,53 +157,3 @@ export default function HeroSection() {
     </section>
   );
 }
-
-// import useEmblaCarousel from "embla-carousel-react";
-// import Autoplay from "embla-carousel-autoplay";
-
-// export default function Slider() {
-//   const [emblaRef] = useEmblaCarousel(
-//     {
-//       loop: true,
-//       align: "start",
-//     },
-//     [Autoplay({ delay: 3000 })]
-//   );
-
-//   const cards = [1, 2, 3, 4, 5, 6];
-
-//   return (
-//     <div className="min-h-screen w-full bg-[#564949] p-4">
-//       <div className="container mx-auto overflow-hidden" ref={emblaRef}>
-        
-//         <div className="flex gap-4">
-
-//           {cards.map((item) => (
-//             <div
-//               key={item}
-//               className="
-//                 min-w-full
-//                 sm:min-w-[calc(50%-8px)]
-//                 md:min-w-[calc(33.333%-11px)]
-//                 lg:min-w-[calc(25%-12px)]
-//                 h-[270px]
-//                 bg-white
-//                 rounded-xl
-//                 flex
-//                 items-center
-//                 justify-center
-//                 text-2xl
-//                 font-bold
-//                 shrink-0
-//               "
-//             >
-//               {item}
-//             </div>
-//           ))}
-
-//         </div>
-
-//       </div>
-//     </div>
-//   );
-// }

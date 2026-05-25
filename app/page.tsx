@@ -6,11 +6,13 @@ import CategoriesSlider from "./components/categories-slider";
 import BestSelling from "./components/best-selling";
 import FeaturedProducts from "./components/featured-products";
 import ProductCard from "./components/product-card";
+import NewArrival from "./components/new-arrival-section";
+import ServicesSection from "./components/services-section";
 
 export default function Home() {
   return (
     <div>
-      {/* <EmblaCarousel /> */}
+
       <HeroSection />
       <FlashSale />
       <CategoriesSlider />
@@ -93,16 +95,9 @@ export default function Home() {
       </div>
 
       <FeaturedProducts />
-
-      {/* <div className="flex mx-auto w-full max-w-screen-xl overflow-hidden">
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-      </div> */}
-
-
+      <NewArrival />
+      <ServicesSection />
+      
     </div>
   );
 }

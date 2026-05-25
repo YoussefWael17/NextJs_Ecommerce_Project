@@ -1,26 +1,11 @@
 "use client"
-import Link from "next/link";
 import React from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-// import {
-//   faMagnifyingGlass,
-//   faHeart,
-//   faCartShopping,
-//   faUser,
-// } from "@fortawesome/free-solid-svg-icons";
-
-import {
-  faHeart,
-  faUser,
-} from "@fortawesome/free-regular-svg-icons";
-
-import {
-  faMagnifyingGlass,
-  faCartShopping,
-} from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faUser } from "@fortawesome/free-regular-svg-icons";
+import { faMagnifyingGlass, faCartShopping } from "@fortawesome/free-solid-svg-icons";
 
 export default function Navbar() {
   // Example

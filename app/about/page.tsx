@@ -3,6 +3,7 @@ import AboutSection from '../components/about-section'
 import Link from 'next/link'
 import StatsSection from '../components/stats-section'
 import TeamSection from '../components/team-section'
+import ServicesSection from '../components/services-section'
 
 export default function AboutPage() {
   return (
@@ -26,6 +27,7 @@ export default function AboutPage() {
     <AboutSection />
     <StatsSection />
     <TeamSection />
+    <ServicesSection />
     </div>
   )
 }
