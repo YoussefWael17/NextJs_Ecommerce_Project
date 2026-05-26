@@ -18,7 +18,7 @@ export default function SignUpPage() {
       </div>
 
       {/* RIGHT SIDE FORM */}
-      <div className="flex items-center justify-center bg-white px-6 py-10">
+      <div className="flex items-center justify-center bg-white px-6 py-30 md:py-10">
         <div className="w-full max-w-md">
 
           {/* LOGO */}

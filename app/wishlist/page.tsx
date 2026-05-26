@@ -51,11 +51,8 @@ export default function WishlistPage() {
     }
   ];
 
-//   const offer:boolean = false;
-//   const isAdded:boolean = true
-
   return (
-    <main className="flex min-h-screen w-full items-center py-10">
+    <main className="flex min-h-screen w-full items-center py-10 mt-15 md:mt-15 mb-10">
       <div className="mx-auto w-full max-w-screen-xl px-4">
 
         {/* WISHLIST SECTION */}

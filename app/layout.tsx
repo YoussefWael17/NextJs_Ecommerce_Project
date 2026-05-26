@@ -5,6 +5,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
+import { Toaster } from "sonner";
 
 config.autoAddCss = false;
 
@@ -43,6 +44,13 @@ export default function RootLayout({
           <main className="flex-1">
             {children}
           </main>
+
+          <Toaster
+            position="top-center"
+            richColors
+            closeButton
+            expand
+          />
 
           {/* Footer */}
           <Footer />

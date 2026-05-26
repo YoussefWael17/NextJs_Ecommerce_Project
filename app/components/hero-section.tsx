@@ -4,6 +4,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 
+import { faApple } from "@fortawesome/free-brands-svg-icons";
+
+import { faClock, faShoePrints } from "@fortawesome/free-solid-svg-icons";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 export default function HeroSection() {
   const categories = [
     "Woman’s Fashion",
@@ -14,23 +20,26 @@ export default function HeroSection() {
     "Sports & Outdoor",
   ];
 
- const slides = [
-  {
-    image: "https://www.pngmart.com/files/22/iPhone-14-PNG-Image.png",
-    brand: "iPhone 14 Series",
-    logo: "🍎",
-  },
-  {
-    image: "https://www.pngmart.com/files/1/Nike-Shoes-Transparent-Background.png",
-    brand: "Nike Collection",
-    logo: "👟",
-  },
-  {
-    image: "https://www.pngmart.com/files/23/Apple-Watch-PNG-Pic.png",
-    brand: "Smart Watch",
-    logo: "⌚",
-  },
-];
+  const slides = [
+    {
+      image:
+        "https://www.pngmart.com/files/22/iPhone-14-PNG-Image.png",
+      brand: "iPhone 14 Series",
+      icon: faApple,
+    },
+    {
+      image:
+        "https://www.pngmart.com/files/1/Nike-Shoes-Transparent-Background.png",
+      brand: "Nike Collection",
+      icon: faShoePrints,
+    },
+    {
+      image:
+        "https://www.pngmart.com/files/23/Apple-Watch-PNG-Pic.png",
+      brand: "Smart Watch",
+      icon: faClock,
+    },
+  ];
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -59,20 +68,23 @@ export default function HeroSection() {
   }, [emblaApi, onSelect]);
 
   return (
-    <section className="bg-white mt-28 mb-10">
-      <div className="w-full max-w-7xl px-6 mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+    <section className="bg-white mt-24 md:mt-28 mb-10">
+      <div className="w-full max-w-7xl px-4 md:px-6 mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
 
         {/* Categories */}
         <div className="border-b lg:border-b-0 lg:border-r border-gray-300 pb-6 lg:pb-0 lg:pr-6">
-          <div className="flex flex-col gap-5">
+
+          <div className="flex flex-wrap lg:flex-col gap-4 lg:gap-5">
+
             {categories.map((category, index) => (
               <button
                 key={index}
-                className="text-left text-[16px] font-medium hover:text-[#DB4444] transition"
+                className="text-left text-sm md:text-[16px] font-medium hover:text-[#DB4444] transition"
               >
                 {category}
               </button>
             ))}
+
           </div>
         </div>
 
@@ -82,53 +94,65 @@ export default function HeroSection() {
 
             {/* viewport */}
             <div
-              className="overflow-hidden bg-black w-full h-[500px] sm:h-[420px] md:h-[360px] lg:h-[320px]"
+              className="overflow-hidden bg-black w-full rounded-md"
               ref={emblaRef}
             >
+
               {/* container */}
               <div className="flex h-full">
 
                 {slides.map((slide, index) => (
                   <div
                     key={index}
-                    className="flex-[0_0_100%] min-w-0 h-full"
+                    className="flex-[0_0_100%] min-w-0"
                   >
-                    <div className="flex flex-col-reverse md:flex-row items-center justify-between h-full px-6 md:px-10 py-8 gap-6">
+
+                    <div className="flex flex-col-reverse md:flex-row items-center justify-between min-h-[520px] md:min-h-[360px] px-5 md:px-12 py-8 md:py-10 gap-8">
 
                       {/* Left Content */}
                       <div className="text-white flex flex-col justify-center w-full md:w-1/2 text-center md:text-left">
 
-                        {/* Top text */}
-                        <span className="text-sm text-gray-400 mb-4">
-                          Up to 15% off
-                        </span>
+                        {/* Brand + Icon */}
+                        <div className="flex items-center justify-center md:justify-start gap-3 mb-5">
 
-                        {/* Brand + logo */}
-                        <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
-                          <span className="text-3xl">
-                            {slide.logo}
-                          </span>
+                          <FontAwesomeIcon
+                            icon={slide.icon}
+                            className="text-3xl md:text-4xl"
+                          />
 
-                          <h1 className="text-3xl md:text-4xl font-bold leading-snug">
+                          <h1 className="text-lg md:text-xl font-medium">
                             {slide.brand}
                           </h1>
+
                         </div>
 
+                        {/* Offer */}
+                        <h2 className="text-4xl sm:text-5xl md:text-4xl lg:text-5xl font-semibold leading-tight mb-6">
+                          Up to 10%
+                          <br />
+                          off Voucher
+                        </h2>
+
                         {/* Button */}
-                        <button className="w-fit mx-auto md:mx-0 border-b border-white pb-1 text-lg hover:text-gray-300 transition">
+                        <button className="w-fit mx-auto md:mx-0 border-b border-white pb-1 text-base md:text-lg hover:text-gray-300 transition">
                           Shop Now →
                         </button>
+
                       </div>
 
                       {/* Right Image */}
-                      <div className="w-full md:w-1/2 flex justify-center md:justify-end items-center">
+                      <div className="w-full md:w-1/2 flex justify-center items-center">
+
                         <img
                           src={slide.image}
                           alt={slide.brand}
-                          className="max-h-[280px] object-contain drop-shadow-2xl mix-blend-lighten"                        />
+                          className="max-h-[220px] sm:max-h-[260px] md:max-h-[300px] object-contain drop-shadow-2xl"
+                        />
+
                       </div>
 
                     </div>
+
                   </div>
                 ))}
 
@@ -136,7 +160,8 @@ export default function HeroSection() {
             </div>
 
             {/* Dots */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+            <div className="hidden md:flex absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+
               {slides.map((_, index) => (
                 <button
                   key={index}
@@ -148,6 +173,7 @@ export default function HeroSection() {
                   }`}
                 />
               ))}
+
             </div>
 
           </div>
@@ -157,3 +183,5 @@ export default function HeroSection() {
     </section>
   );
 }
+
+

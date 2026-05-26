@@ -2,6 +2,7 @@
 
 import { faHeart, faEye, faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { toast } from "sonner";
 import React from "react";
 
 interface Product {
@@ -16,8 +17,6 @@ interface Product {
 }
 
 interface ProductCardProps {
-  // isOffer: boolean;
-  // isAdded: boolean;
   product: Product;
 }
 
@@ -52,7 +51,10 @@ export default function ProductCard({product}: ProductCardProps) {
             <div className="absolute top-3 right-3 flex flex-col gap-2">
 
               {!isAdded && (
-                <button className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition">
+                <button onClick={() =>
+                  toast.success("Product Added To Wishlist")
+                } 
+                className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition">
                   <FontAwesomeIcon icon={faHeart} />
                 </button>
               )}
@@ -62,20 +64,27 @@ export default function ProductCard({product}: ProductCardProps) {
               </button>
 
               {isAdded && (
-                <button className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition">
-                  <FontAwesomeIcon icon={faTrashCan} />
-              </button>
+                <button
+                  onClick={() =>
+                    toast.error("Product Removed From Wishlist")
+                  }
+                  className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition">
+                    <FontAwesomeIcon icon={faTrashCan} />
+                </button>
               )}
 
             </div>
 
             {/* ADD TO CART */}
             <button
+              onClick={() =>
+                toast.success("Product added to cart")
+              }
               className="
                 absolute bottom-0 left-0 w-full
-                translate-y-3
+                translate-y-0 lg:translate-y-3 
                 bg-black py-3 text-white
-                opacity-0
+                opacity-100 lg:opacity-0
                 transition-all duration-300
                 group-hover:translate-y-0
                 group-hover:opacity-100
@@ -104,6 +113,7 @@ export default function ProductCard({product}: ProductCardProps) {
               <span className="font-bold text-red-500">
                 ${product.price}
               </span>
+
 
               {isOffered && (
                 <span className="text-sm text-gray-400 line-through">
