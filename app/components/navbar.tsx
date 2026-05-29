@@ -140,7 +140,7 @@ export default function Navbar() {
       <div
         className={`overflow-hidden transition-all duration-300 md:hidden ${
           isOpen
-            ? "max-h-[500px] border-t border-gray-200"
+            ? "max-h-125 border-t border-gray-200"
             : "max-h-0"
         }`}
       >

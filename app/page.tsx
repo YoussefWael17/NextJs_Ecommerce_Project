@@ -19,7 +19,7 @@ export default function Home() {
       <BestSelling />
 
       <div className="w-full py-16">
-        <div className="mx-auto max-w-screen-xl px-4">
+        <div className="mx-auto max-w-7xl px-4">
 
           <div className="grid grid-cols-1 md:grid-cols-2 bg-black rounded-lg overflow-hidden">
 
@@ -72,16 +72,16 @@ export default function Home() {
               <div className="relative flex items-center justify-center bg-black">
 
               {/* WHITE GLOW */}
-              <div className="absolute w-[350px] h-[350px] bg-white/20 blur-3xl rounded-full"></div>
+              <div className="absolute w-87.5 h-87.5 bg-white/20 blur-3xl rounded-full"></div>
 
               {/* SECOND SOFT LAYER (optional for depth) */}
-              <div className="absolute w-[250px] h-[250px] bg-white/10 blur-2xl rounded-full"></div>
+              <div className="absolute w-62.5 h-62.5 bg-white/10 blur-2xl rounded-full"></div>
 
               {/* IMAGE */}
               <img
                 src="https://www.pngmart.com/files/7/Bluetooth-Speaker-PNG-Image.png"
                 // src="https://pngimg.com/uploads/headphones/headphones_PNG101975.png"
-                className="relative z-10 h-[320px] object-contain drop-shadow-[0_0_40px_rgba(255,255,255,0.25)]"
+                className="relative z-10 h-80 object-contain drop-shadow-[0_0_40px_rgba(255,255,255,0.25)]"
                 alt="headphones"
               />
 

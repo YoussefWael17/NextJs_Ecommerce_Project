@@ -29,15 +29,15 @@ export default function ProductCard({product}: ProductCardProps) {
       <div className="px-2">
 
         {/* CARD */}
-        <div className="group h-[350px] overflow-hidden bg-white rounded-lg">
+        <div className="group h-87.5 overflow-hidden bg-white rounded-lg">
 
           {/* IMAGE */}
-          <div className="relative flex h-[250px] items-center justify-center bg-[#F5F5F5]">
+          <div className="relative flex h-62.5 items-center justify-center bg-[#F5F5F5]">
 
             <img
               src={product.image}
               alt={product.name}
-              className="h-[150px] object-contain"
+              className="h-37.5 object-contain"
             />
 
             {/* OFFER BADGE */}

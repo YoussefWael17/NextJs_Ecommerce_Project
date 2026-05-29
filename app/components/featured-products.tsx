@@ -51,7 +51,7 @@ export default function FeaturedProducts() {
   return (
     <div className="flex w-full items-center mb-17.5">
 
-      <div className="mx-auto w-full max-w-screen-xl px-4">
+      <div className="mx-auto w-full max-w-7xl px-4">
         
         <div className="flex w-full flex-row items-end justify-between px-4 mb-10">
           <div className="flex flex-col">
@@ -124,11 +124,11 @@ export default function FeaturedProducts() {
                         >
 
                         {/* IMAGE */}
-                        <div className="relative flex h-[250px] items-center justify-center bg-[#F5F5F5]">
+                        <div className="relative flex h-62.5 items-center justify-center bg-[#F5F5F5]">
 
                             <img
                             src="https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png"
-                            className="h-[150px] object-contain"
+                            className="h-37.5 object-contain"
                             />
 
                             <span className="absolute top-3 left-3 bg-[#DB4444] px-2 py-1 text-sm text-white">
@@ -205,9 +205,9 @@ export default function FeaturedProducts() {
 
         </div>
 
-        <button className="mx-auto rounded bg-[#DB4444] px-12 py-4 shadow w-[234px] h-[56px] flex justify-center items-center cursor-pointer text-white my-15">View All Products</button>
+        <button className="mx-auto rounded bg-[#DB4444] px-12 py-4 shadow w-58.5 h-14 flex justify-center items-center cursor-pointer text-white my-15">View All Products</button>
 
-        <hr className="hidden md:block border-0 h-0.25 bg-gray-200 mt-[70px]" />
+        <hr className="hidden md:block border-0 h-px bg-gray-200 mt-17.5" />
 
         {/* <hr className="hidden md:block border-0 h-0.25 bg-gray-200 mt-[70px]" /> */}
 

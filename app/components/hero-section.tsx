@@ -107,7 +107,7 @@ export default function HeroSection() {
                     className="flex-[0_0_100%] min-w-0"
                   >
 
-                    <div className="flex flex-col-reverse md:flex-row items-center justify-between min-h-[520px] md:min-h-[360px] px-5 md:px-12 py-8 md:py-10 gap-8">
+                    <div className="flex flex-col-reverse md:flex-row items-center justify-between min-h-130 md:min-h-90 px-5 md:px-12 py-8 md:py-10 gap-8">
 
                       {/* Left Content */}
                       <div className="text-white flex flex-col justify-center w-full md:w-1/2 text-center md:text-left">
@@ -146,7 +146,7 @@ export default function HeroSection() {
                         <img
                           src={slide.image}
                           alt={slide.brand}
-                          className="max-h-[220px] sm:max-h-[260px] md:max-h-[300px] object-contain drop-shadow-2xl"
+                          className="max-h-55 sm:max-h-65 md:max-h-75 object-contain drop-shadow-2xl"
                         />
 
                       </div>
@@ -160,7 +160,7 @@ export default function HeroSection() {
             </div>
 
             {/* Dots */}
-            <div className="hidden md:flex absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+            <div className="hidden md:flex absolute bottom-4 left-1/2 -translate-x-1/2 gap-3 z-20">
 
               {slides.map((_, index) => (
                 <button

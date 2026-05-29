@@ -37,7 +37,7 @@ export default function StatsSection() {
 
   return (
     <section className="flex h-[70vh] w-full items-center my-10">
-      <div className="mx-auto w-full max-w-screen-xl px-4">
+      <div className="mx-auto w-full max-w-7xl px-4">
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">

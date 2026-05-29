@@ -8,7 +8,7 @@ import ServicesSection from '../components/services-section'
 export default function AboutPage() {
   return (
     <div>
-        <div className="mx-auto w-full max-w-screen-xl py-10">
+        <div className="mx-auto w-full max-w-7xl py-10">
             
             {/* BREADCRUMB */}
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-10">

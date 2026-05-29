@@ -25,7 +25,7 @@ export default function CartPage() {
 
   return (
     <div className="w-full py-10">
-      <div className="mx-auto max-w-screen-xl px-4">
+      <div className="mx-auto max-w-7xl px-4">
 
         {/* BREADCRUMB */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-10">
@@ -136,7 +136,7 @@ export default function CartPage() {
 
         {/* TOTAL */}
         <div className="flex justify-end mt-10">
-          <div className="w-full md:w-[350px] border rounded-2xl p-6">
+          <div className="w-full md:w-87.5 border rounded-2xl p-6">
 
             <h2 className="text-xl font-semibold mb-6">
               Cart Total
