@@ -120,7 +120,7 @@ export default function RootLayout({
     "block px-3 py-2 rounded-md text-gray-500 hover:text-[#DB4444] hover:bg-gray-50 transition";
 
   return (
-    <div className="mx-auto w-full max-w-screen-xl px-4 py-10">
+    <div className="mx-auto w-full max-w-7xl px-4 py-10">
 
       {/* Breadcrumb */}
       <div className="flex items-center justify-between mb-6 text-sm text-gray-500">
@@ -143,7 +143,7 @@ export default function RootLayout({
 
       {/* ================= MOBILE DRAWER (FIXED PROPER) ================= */}
       {open && (
-        <div className="fixed inset-0 top-0 z-[99999] lg:hidden">
+        <div className="fixed inset-0 top-0 z-99999 lg:hidden">
 
           {/* Overlay */}
           <div
