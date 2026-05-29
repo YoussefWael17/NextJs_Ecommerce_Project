@@ -6,6 +6,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import { Toaster } from "sonner";
+import Script from "next/script";
 
 config.autoAddCss = false;
 
@@ -43,6 +44,11 @@ export default function RootLayout({
           {/* Page Content */}
           <main className="flex-1">
             {children}
+
+            <Script
+              src="https://accounts.google.com/gsi/client"
+              strategy="afterInteractive"
+            />
           </main>
 
           <Toaster

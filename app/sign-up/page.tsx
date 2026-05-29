@@ -1,12 +1,59 @@
 'use client'
 
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { FcGoogle } from "react-icons/fc";
+import axios from "axios";
+import Script from 'next/script';
 
 export default function SignUpPage() {
+
+  const initialized = useRef(false)
+
+  const handleResponse = async (response: any) => {
+  // console.log("ID TOKEN:", response.credential)
+
+  await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
+    token: response.credential  
+  })
+}
+
+  useEffect(() => {
+  const interval = setInterval(() => {
+    const google = (window as any).google
+
+    if (!google || initialized.current) return
+
+    google.accounts.id.initialize({
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+      callback: handleResponse,
+    })
+
+    const buttonDiv = document.getElementById("google-hidden-btn")
+
+    if (buttonDiv) {
+      google.accounts.id.renderButton(buttonDiv, {
+        theme: "outline",
+        size: "large",
+      })
+    }
+
+    initialized.current = true
+    clearInterval(interval)
+  }, 100)
+
+  return () => clearInterval(interval)
+}, [])
+  
+
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+
+        {/* Google Script */}
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
 
       {/* LEFT SIDE IMAGE */}
       <div className="relative hidden lg:block h-screen w-full py-15">
@@ -82,14 +129,20 @@ export default function SignUpPage() {
               {/* GOOGLE BUTTON */}
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 rounded border border-gray-300 bg-white text-black py-3 hover:bg-black  hover:text-white transition duration-300"
+                onClick={() => {
+                  const googleButton = document.querySelector(
+                    '#google-hidden-btn div[role="button"]'
+                  ) as HTMLElement
+
+                  googleButton?.click()
+                }}
+                className="w-full flex items-center justify-center gap-3 rounded border border-gray-300 bg-white text-black py-3 hover:bg-black hover:text-white transition duration-300"
               >
                 <FcGoogle className="text-lg" />
-
-                <span>
-                  Sign up with Google
-                </span>
+                <span>Sign up with Google</span>
               </button>
+
+              <div id="google-hidden-btn" className="hidden"></div>             
 
             </div>
             
