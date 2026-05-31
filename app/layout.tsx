@@ -7,6 +7,8 @@ import Navbar from "./components/navbar";
 import Footer from "./components/footer";
 import { Toaster } from "sonner";
 import Script from "next/script";
+import Providers from "./providers";
+
 
 config.autoAddCss = false;
 
@@ -35,6 +37,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <Providers>
       <body className="min-h-full flex flex-col">
 
         <div className="flex min-h-screen flex-col">
@@ -64,6 +67,7 @@ export default function RootLayout({
 
         {/* {children} */}
       </body>
+      </Providers>
     </html>
   );
 }

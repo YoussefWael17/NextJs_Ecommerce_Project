@@ -1,41 +1,501 @@
 "use client";
 
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-
-import {
-  faBox,
-  faBoxesStacked,
-  faTag,
-  faMagnifyingGlass,
-  faPenToSquare,
-  faTrash,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import Image from "next/image";
 import { toast } from "sonner";
 
-type ProductStatus = "IN_STOCK" | "OUT_OF_STOCK";
+import { useGetProductsQuery, useAddProductMutation, useUpdateProductMutation } from "@/app/redux/services/adminsApi";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
+import { faPlus, faBoxesStacked, faBox, faTag, faMagnifyingGlass, faTrash } from "@fortawesome/free-solid-svg-icons";
+
+const getImageUrl = (img: unknown): string => {
+  if (!img) return "/product-placeholder.jpg";
+
+  if (typeof img === "string") return img;
+
+  if (img instanceof File) {
+    return URL.createObjectURL(img);
+  }
+
+  return "/product-placeholder.jpg";
+};
+
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const mockData = [
+  {
+    "id": "p1",
+    "title": "Nike Air Max 270",
+    "slug": "nike-air-max-270",
+    "description": "Comfortable and stylish running shoes for everyday wear.",
+    "thumbnail": "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+
+    "isActive": true,
+    "isSale": false,
+
+    "categoryId": "c1",
+    "category": {
+      "id": "c1",
+      "name": "Shoes",
+      "slug": "shoes",
+      "image": "https://images.unsplash.com/photo-1528701800489-20be3c1ea5f3",
+      "createdAt": "2026-05-01T10:00:00.000Z"
+    },
+
+    "vendorId": "v1",
+    "vendor": {
+      "id": "v1",
+      "name": "Nike Store",
+      "email": "nike@store.com"
+    },
+
+    "variants": [
+      {
+        "id": "v1-1",
+        "sku": "NIKE-270-RED-42",
+        "price": 150,
+        "discountPrice": 130,
+        "stock": 12,
+        "productId": "p1",
+        "sizeId": "s1",
+        "colorId": "col1",
+        "createdAt": "2026-05-01T10:00:00.000Z",
+        "size": {
+          "id": "s1",
+          "name": "42"
+        },
+        "color": {
+          "id": "col1",
+          "name": "Red",
+          "hexCode": "#ff0000"
+        }
+      }
+    ],
+
+    "images": [
+      {
+        "id": "img1",
+        "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+        "isPrimary": true,
+        "productId": "p1",
+        "createdAt": "2026-05-01T10:00:00.000Z"
+      },
+      {
+        "id": "img2",
+        "image": "https://images.unsplash.com/photo-1528701800489-20be3c1ea5f3",
+        "isPrimary": false,
+        "productId": "p1",
+        "createdAt": "2026-05-01T10:00:00.000Z"
+      }
+    ],
+
+    "createdAt": "2026-05-01T10:00:00.000Z",
+    "updatedAt": "2026-05-02T10:00:00.000Z"
+  },
+
+  {
+    "id": "p2",
+    "title": "Adidas Ultraboost",
+    "slug": "adidas-ultraboost",
+    "description": "High performance running shoes with maximum comfort.",
+    "thumbnail": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb",
+
+    "isActive": true,
+    "isSale": true,
+
+    "categoryId": "c1",
+    "category": {
+      "id": "c1",
+      "name": "Shoes",
+      "slug": "shoes",
+      "image": "https://images.unsplash.com/photo-1528701800489-20be3c1ea5f3",
+      "createdAt": "2026-05-01T10:00:00.000Z"
+    },
+
+    "vendorId": "v2",
+    "vendor": {
+      "id": "v2",
+      "name": "Adidas Store",
+      "email": "adidas@store.com"
+    },
+
+    "variants": [
+      {
+        "id": "v2-1",
+        "sku": "ADIDAS-UB-44",
+        "price": 180,
+        "discountPrice": 160,
+        "stock": 5,
+        "productId": "p2",
+        "sizeId": "s2",
+        "colorId": "col2",
+        "createdAt": "2026-05-01T10:00:00.000Z",
+        "size": {
+          "id": "s2",
+          "name": "44"
+        },
+        "color": {
+          "id": "col2",
+          "name": "Black",
+          "hexCode": "#000000"
+        }
+      }
+    ],
+
+    "images": [
+      {
+        "id": "img3",
+        "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb",
+        "isPrimary": true,
+        "productId": "p2",
+        "createdAt": "2026-05-01T10:00:00.000Z"
+      }
+    ],
+
+    "createdAt": "2026-05-01T10:00:00.000Z",
+    "updatedAt": "2026-05-03T10:00:00.000Z"
+  }
+]
+
+
+interface ProductFormValues {
+  title: string;
+  slug: string;
+  description: string;
+  thumbnail: File | null;
+  categoryId: string;
+
+  variants: {
+    sku: string;
+    price: number;
+    discountPrice: number;
+    stock: number;
+    sizeId: string;
+    colorId: string;
+  }[];
+
+  images: {
+    image: File | null;
+    isPrimary: boolean;
+  }[];
+}
+
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  createdAt: string;
+}
+
+interface Vendor {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface Size {
+  id: string;
+  name: string;
+}
+
+interface Color {
+  id: string;
+  name: string;
+  hexCode?: string;
+}
+
+interface Variant {
+  id: string;
+  sku: string;
+  price: number;
+  discountPrice: number;
+  stock: number;
+
+  productId: string;
+
+  sizeId: string;
+  colorId: string;
+
+  createdAt: string;
+
+  size?: Size;
+  color?: Color;
+}
+
+interface ProductImage {
+  id: string;
+  image: string;
+  isPrimary: boolean;
+  productId: string;
+  createdAt: string;
+}
 
 interface Product {
   id: string;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
+
+  title: string;
+  slug: string;
+  description: string;
+  thumbnail: string;
+
+  isActive: boolean;
+  isSale: boolean;
+
+  categoryId: string;
+  category: Category;
+
+  vendorId: string;
+  vendor: Vendor;
+
+  variants: Variant[];
+  images: ProductImage[];
+
   createdAt: string;
-  status: ProductStatus;
-  image: string;
+  updatedAt: string;
 }
+
 
 export default function AdminProductsPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [previewImage, setPreviewImage] = useState("");
-
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Mock Data
+  const [products, setProducts] = useState<Product[]>(mockData);
+
+  // Mock Data
+  const handleSubmit = async (values: ProductFormValues) => {
+  try {
+    const newProduct: Product = {
+      id: editingProduct ? editingProduct.id : `p${Date.now()}`,
+      title: values.title,
+      slug: values.slug,
+      description: values.description,
+      thumbnail: previewImage || "/product-placeholder.jpg",
+
+      isActive: true,
+      isSale: false,
+
+      categoryId: values.categoryId,
+      category: editingProduct?.category || {
+        id: values.categoryId,
+        name: "Unknown",
+        slug: "",
+        image: "",
+        createdAt: new Date().toISOString(),
+      },
+
+      vendorId: editingProduct?.vendorId || "v1",
+      vendor: editingProduct?.vendor || {
+        id: "v1",
+        name: "Mock Vendor",
+        email: "vendor@test.com",
+      },
+
+      variants: values.variants.map((v, idx) => ({
+        id: editingProduct
+          ? editingProduct.variants[idx]?.id || `v-${Date.now()}-${idx}`
+          : `v-${Date.now()}-${idx}`,
+        sku: v.sku,
+        price: v.price,
+        discountPrice: v.discountPrice,
+        stock: v.stock,
+        productId: editingProduct?.id || "",
+        sizeId: v.sizeId,
+        colorId: v.colorId,
+        createdAt: new Date().toISOString(),
+      })),
+
+      images: [
+        {
+          id: `img-${Date.now()}`,
+          image: previewImage || "",
+          isPrimary: true,
+          productId: editingProduct?.id || "",
+          createdAt: new Date().toISOString(),
+        },
+      ],
+
+      createdAt: editingProduct?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (editingProduct) {
+      setProducts((prev) =>
+        prev.map((p) => (p.id === editingProduct.id ? newProduct : p))
+      );
+
+      toast.success("Product Updated Successfully");
+    } else {
+      setProducts((prev) => [newProduct, ...prev]);
+      toast.success("Product Added Successfully");
+    }
+
+    setIsModalOpen(false);
+    setEditingProduct(null);
+    setPreviewImage("");
+    formik.resetForm();
+  } catch (err) {
+    toast.error("Something went wrong");
+  }
+};
+
+  //Api Calling
+  // const { data: products = [] } = useGetProductsQuery();
+  // const [addProduct] = useAddProductMutation();
+  // const [updateProduct] = useUpdateProductMutation();
+
+  //Api Calling
+  // const handleSubmit = async (values: ProductFormValues) => {
+  //   try {
+  //     const formData = new FormData();
+
+  //     formData.append("title", values.title);
+  //     formData.append("slug", values.slug);
+  //     formData.append("description", values.description);
+  //     formData.append("categoryId", values.categoryId);
+
+  //     formData.append("thumbnail", values.thumbnail as File);
+
+  //     formData.append(
+  //       "variant_price",
+  //       String(values.variants[0].price)
+  //     );
+
+  //     formData.append(
+  //       "variant_stock",
+  //       String(values.variants[0].stock)
+  //     );
+
+  //     if (editingProduct) {
+  //       await updateProduct({
+  //         id: editingProduct.id,
+  //         data: formData,
+  //       }).unwrap();
+
+  //       toast.success("Product Updated Successfully");
+  //     } else {
+  //       await addProduct(formData).unwrap();
+
+  //       toast.success("Product Added Successfully");
+  //     }
+
+  //     setIsModalOpen(false);
+  //     setEditingProduct(null);
+  //     setPreviewImage("");
+  //     formik.resetForm();
+  //   } catch (err) {
+  //     toast.error("Something went wrong");
+  //   }
+  // };
+
+  const validationSchema = Yup.object({
+    title: Yup.string()
+      .required("Title is required")
+      .min(3, "Title must be at least 3 characters"),
+
+    slug: Yup.string()
+      .required("Slug is required")
+      .min(3, "Slug must be at least 3 characters"),
+
+    description: Yup.string()
+      .required("Description is required")
+      .min(10, "Description must be at least 10 characters"),
+
+    thumbnail: Yup.mixed<File>()
+      .required("Thumbnail is required"),
+
+    categoryId: Yup.string()
+      .required("Category is required"),
+
+    variants: Yup.array()
+      .of(
+        Yup.object({
+          sku: Yup.string()
+            .required("SKU is required"),
+
+          price: Yup.number()
+            .required("Price is required")
+            .min(0, "Price cannot be negative"),
+
+          discountPrice: Yup.number()
+            .nullable()
+            .min(0, "Discount price cannot be negative")
+            .test(
+              "discount-price",
+              "Discount price must be less than or equal to price",
+              function (value) {
+                if (value === undefined || value === null) return true;
+
+                return value <= this.parent.price;
+              }
+            ),
+
+          stock: Yup.number()
+            .required("Stock is required")
+            .min(0, "Stock cannot be negative"),
+
+          sizeId: Yup.string()
+            .required("Size is required"),
+
+          colorId: Yup.string()
+            .required("Color is required"),
+        })
+      )
+      .min(1, "At least one variant is required"),
+
+    images: Yup.array()
+      .of(
+        Yup.object({
+          image: Yup.mixed<File>()
+            .required("Image is required"),
+
+          isPrimary: Yup.boolean()
+            .required("Primary image status is required"),
+        })
+      )
+      .min(1, "At least one image is required"),
+  });
+
+  const formik = useFormik<ProductFormValues>({
+    initialValues: {
+      title: "",
+      slug: "",
+      description: "",
+      thumbnail: null,
+      categoryId: "",
+      variants: [
+        {
+          sku: "",
+          price: 0,
+          discountPrice: 0,
+          stock: 0,
+          sizeId: "",
+          colorId: "",
+        },
+      ],
+      images: [
+        {
+          image: null,
+          isPrimary: true,
+        },
+      ],
+    },
+    validationSchema,
+    onSubmit: handleSubmit,
+  });
 
   const handleImageUpload = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -44,166 +504,62 @@ export default function AdminProductsPage() {
 
     if (!file) return;
 
-    const imageUrl = URL.createObjectURL(file);
+    setPreviewImage(URL.createObjectURL(file));
 
-    setPreviewImage(imageUrl);
+    formik.setFieldValue("thumbnail", file);
 
-    setFormData({
-      ...formData,
-      image: imageUrl,
-    });
-  };
-
-  const [formData, setFormData] = useState({
-    name: "",
-    category: "",
-    price: "",
-    stock: "",
-    image: "",
-    status: "IN_STOCK",
-  });
-
-  const handleAddProduct = () => {
-    setEditingProduct(null);
-    setPreviewImage("");
-
-    setFormData({
-      name: "",
-      category: "",
-      price: "",
-      stock: "",
-      image: '',
-      status: "IN_STOCK",
-    });
-
-    setIsModalOpen(true);
+    formik.setFieldValue("images[0].image", file);
   };
 
   const handleEditProduct = (product: Product) => {
-
     setEditingProduct(product);
 
-    setPreviewImage(product.image);
+    setPreviewImage(product.thumbnail);
 
-    setFormData({
-      name: product.name,
-      category: product.category,
-      price: String(product.price),
-      stock: String(product.stock),
-      image: product.image,
-      status: product.status,
+    formik.setValues({
+      title: product.title,
+      slug: product.slug,
+      description: "Product description",
+      thumbnail: null,
+      categoryId: product.category.id,
+
+      variants: [
+        {
+          sku: "SKU-001",
+          price: product.variants[0].price,
+          discountPrice: product.variants[0].discountPrice,
+          stock: product.variants[0].stock,
+          sizeId: "SIZE-1",
+          colorId: "COLOR-1",
+        },
+      ],
+
+      images: [
+        {
+          image: null,
+          isPrimary: true,
+        },
+      ],
     });
 
     setIsModalOpen(true);
   };
 
-  const handleSaveProduct = () => {
+  const handleAddProduct = () => {
+    setEditingProduct(null);
 
-  if (editingProduct) {
+    setPreviewImage("");
 
-    setProducts((prev) =>
-      prev.map((item) =>
-        item.id === editingProduct.id
-          ? {
-              ...item,
-              name: formData.name,
-              category: formData.category,
-              price: Number(formData.price),
-              stock: Number(formData.stock),
-              image: formData.image,
-              status: formData.status as ProductStatus,
-            }
-          : item
-      )
-    );
-    toast.success("Update Product Successfully")
+    formik.resetForm();
 
-  } else {
-
-    const newProduct: Product = {
-      id: crypto.randomUUID(),
-      name: formData.name,
-      category: formData.category,
-      price: Number(formData.price),
-      stock: Number(formData.stock),
-      status: formData.status as ProductStatus,
-      createdAt: new Date().toISOString(),
-      image: formData.image
-    };
-
-    setProducts((prev) => [newProduct, ...prev]);
-
-    toast.success("Product Added Successfully")
-  }
-
-  setIsModalOpen(false);
-};
-
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: "1",
-      name: "Gaming Laptop",
-      category: "Electronics",
-      price: 1200,
-      stock: 15,
-      image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
-      createdAt: "2025-07-20",
-      status: "IN_STOCK",
-    },
-    {
-      id: "2",
-      name: "Wireless Headphones",
-      category: "Accessories",
-      price: 180,
-      stock: 8,
-      image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
-      createdAt: "2025-07-18",
-      status: "IN_STOCK",
-    },
-    {
-      id: "3",
-      name: "Smart Watch",
-      category: "Wearables",
-      price: 250,
-      stock: 0,
-      image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
-      createdAt: "2025-07-15",
-      status: "OUT_OF_STOCK",
-    },
-    {
-      id: "4",
-      name: "Mechanical Keyboard",
-      category: "Accessories",
-      price: 90,
-      stock: 20,
-      image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
-      createdAt: "2025-07-10",
-      status: "IN_STOCK",
-    },
-  ]);
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    setIsModalOpen(true);
   };
 
   const totalProducts = products.length;
-
-  const inStockProducts = products.filter(
-    (product) => product.status === "IN_STOCK"
-  ).length;
-
-  const outOfStockProducts = products.filter(
-    (product) => product.status === "OUT_OF_STOCK"
-  ).length;
-
-  const totalInventory = products.reduce(
-    (sum, product) => sum + product.stock,
-    0
-  );
+  
+  const inStockProducts = 100;
+  const outOfStockProducts = 200
+  const totalInventory = 1033;
 
   return (
     
@@ -318,6 +674,7 @@ export default function AdminProductsPage() {
               <tr className="text-left text-sm text-gray-400">
                 <th className="px-4">Product</th>
                 <th className="px-4">Category</th>
+                <th className="px-4">Vendor</th>
                 <th className="px-4">Price</th>
                 <th className="px-4">Stock</th>
                 <th className="px-4">Status</th>
@@ -336,12 +693,8 @@ export default function AdminProductsPage() {
             
                       <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-gray-200">
                         <Image
-                          src={
-                            product.image && product.image.trim()
-                              ? product.image
-                              : "/product-placeholder.jpg"
-                          }
-                          alt={product.name}
+                          src={getImageUrl(product.thumbnail)}
+                          alt={product.title}
                           fill
                           className="object-cover"
                         />
@@ -349,7 +702,7 @@ export default function AdminProductsPage() {
 
                       <div>
                         <h3 className="font-semibold">
-                          {product.name}
+                          {product.title}
                         </h3>
 
                         <p className="text-sm text-gray-500">
@@ -360,26 +713,30 @@ export default function AdminProductsPage() {
                   </td>
 
                   <td className="px-4 py-4">
-                    {product.category}
+                    {product.category?.name}
                   </td>
 
                   <td className="px-4 py-4">
-                    ${product.price}
+                    {product.vendor?.name || "-"}
                   </td>
 
                   <td className="px-4 py-4">
-                    {product.stock}
+                    ${product.variants?.[0]?.price}
+                  </td>
+
+                  <td className="px-4 py-4">
+                     {product.variants?.[0]?.stock}
                   </td>
 
                   <td className="px-4 py-4">
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        product.status === "IN_STOCK"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-red-100 text-red-600"
+                        product.variants?.[0]?.stock == 0
+                          ? "bg-red-100 text-red-600" 
+                          : "bg-green-100 text-green-600"
                       }`}
                     >
-                      {product.status}
+                       {product.variants?.[0]?.stock == 0 ? "Out Of Stock" : "In Stock"}
                     </span>
                   </td>
 
@@ -401,67 +758,87 @@ export default function AdminProductsPage() {
         </div>
 
         {/* Mobile */}
-        <div className="space-y-4 lg:hidden">
+        <div className="space-y-5 lg:hidden">
           {products.map((product) => (
             <div
               key={product.id}
-              className="rounded-3xl border border-gray-200 bg-gray-50 p-4"
+              className="rounded-3xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md"
             >
-              <div className="flex items-center gap-3">
-                <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-gray-200">
-                  <Image
-                    src={
-                      product.image && product.image.trim()
-                        ? product.image
-                        : "/product-placeholder.jpg"
-                    }
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
+              {/* Header */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  
+                  <div className="relative h-14 w-14 overflow-hidden rounded-xl border">
+                    <Image
+                      src={getImageUrl(product.thumbnail)}
+                      alt={product.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {product.title}
+                    </h3>
+
+                    <p className="text-sm text-gray-500">
+                      {product.category?.name}
+                    </p>
+                  </div>
                 </div>
 
-                <div>
-                  <h3 className="font-semibold">
-                    {product.name}
-                  </h3>
+                {/* Status */}
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    product.variants?.[0]?.stock == 0 
+                    ? "bg-red-100 text-red-600"
+                    : "bg-green-100 text-green-600"
+                  }`}
+                >
+                  {product.variants?.[0]?.stock == 0 ? "Out Of Stock" : "In Stock"}
+                </span>
+              </div>
 
-                  <p className="text-sm text-gray-500">
-                    {product.category}
+              {/* Info */}
+              <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-xl bg-gray-50 p-3">
+                  <p className="text-gray-500">Price</p>
+                  <p className="font-semibold">${product.variants?.[0]?.price}</p>
+                </div>
+
+                <div className="rounded-xl bg-gray-50 p-3">
+                  <p className="text-gray-500">Stock</p>
+                  <p className="font-semibold">{product.variants?.[0]?.stock}</p>
+                </div>
+
+                <div className="rounded-xl bg-gray-50 p-3">
+                  <p className="text-gray-500">Vendor</p>
+                  <p className="font-semibold">{product.vendor?.name}</p>
+                </div>
+
+                <div className="rounded-xl bg-gray-50 p-3">
+                  <p className="text-gray-500">Created</p>
+                  <p className="font-semibold">
+                    {formatDate(product.createdAt)}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 space-y-3">
-                <p className="text-sm">
-                  Price: ${product.price}
-                </p>
-
-                <p className="text-sm">
-                  Stock: {product.stock}
-                </p>
-
-                <span
-                  className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
-                    product.status === "IN_STOCK"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-red-100 text-red-600"
-                  }`}
+              {/* Actions */}
+              <div className="mt-4 flex gap-3">
+                <button
+                  onClick={() => handleEditProduct(product)}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white py-3 text-sm hover:border-[#DB4444] hover:text-[#DB4444]"
                 >
-                  {product.status}
-                </span>
+                  <FontAwesomeIcon icon={faPenToSquare} />
+                  Edit
+                </button>
 
-                <div className="flex gap-3 pt-2">
-                  <button onClick={() => handleEditProduct(product)} className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 hover:border-[#DB4444] hover:text-[#DB4444]">
-                    <FontAwesomeIcon icon={faPenToSquare} />
-                    Edit
-                  </button>
-
-                  <button className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 hover:border-red-500 hover:text-red-500">
-                    <FontAwesomeIcon icon={faTrash} />
-                    Delete
-                  </button>
-                </div>
+                <button className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white py-3 text-sm hover:border-red-500 hover:text-red-500">
+                  <FontAwesomeIcon icon={faTrash} />
+                  Delete
+                </button>
               </div>
             </div>
           ))}
@@ -470,216 +847,294 @@ export default function AdminProductsPage() {
 
       {
         isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 ">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl">
 
-            <div className="flex min-h-full items-center justify-center  w-full md:w-fit">
-              <div className="w-full rounded-3xl bg-white p-6 shadow-xl">
+            <form onSubmit={formik.handleSubmit}>
 
-                {/* Header */}
-                <div className="mb-6 flex items-center justify-between mt-40 md:mt-0 ">
+              {/* Header */}
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-2xl font-bold">
+                  {editingProduct ? "Edit Product" : "Add Product"}
+                </h2>
 
-                  <h2 className="text-2xl font-bold text-black">
-                    {editingProduct
-                      ? "Edit Product"
-                      : "Add Product"}
-                  </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-3xl text-gray-400 hover:text-red-500"
+                >
+                  ×
+                </button>
+              </div>
 
-                  <button
-                    onClick={() =>
-                      setIsModalOpen(false)
-                    }
-                    className="text-2xl text-gray-400 hover:text-red-500"
-                  >
-                    ×
-                  </button>
+              {/* Fields */}
+              <div className="grid gap-4 md:grid-cols-2">
 
+                {/* Title */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Title
+                  </label>
+
+                  <input
+                    type="text"
+                    name="title"
+                    value={formik.values.title}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
+
+                  {formik.touched.title &&
+                    formik.errors.title && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {formik.errors.title}
+                      </p>
+                    )}
                 </div>
 
-                {/* Form */}
-                <div className="grid gap-4 md:grid-cols-2">
+                {/* Slug */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Slug
+                  </label>
 
-                  {/* Name */}
-                  <div>
+                  <input
+                    type="text"
+                    name="slug"
+                    value={formik.values.slug}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
 
-                    <label className="mb-2 block text-sm font-medium">
-                      Product Name
-                    </label>
+                  {formik.touched.slug &&
+                    formik.errors.slug && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {formik.errors.slug}
+                      </p>
+                    )}
+                </div>
 
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          name: e.target.value,
-                        })
-                      }
-                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
-                    />
+                {/* Category */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Category Id
+                  </label>
 
-                  </div>
+                  <input
+                    type="text"
+                    name="categoryId"
+                    value={formik.values.categoryId}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
 
-                  {/* Category */}
-                  <div>
+                  {formik.touched.categoryId &&
+                    formik.errors.categoryId && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {formik.errors.categoryId}
+                      </p>
+                    )}
+                </div>
 
-                    <label className="mb-2 block text-sm font-medium">
-                      Category
-                    </label>
+                {/* SKU */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    SKU
+                  </label>
 
-                    <input
-                      type="text"
-                      value={formData.category}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          category: e.target.value,
-                        })
-                      }
-                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
-                    />
+                  <input
+                    type="text"
+                    name="variants[0].sku"
+                    value={formik.values.variants[0].sku}
+                    onChange={formik.handleChange}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
+                </div>
 
-                  </div>
+                {/* Price */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Price
+                  </label>
 
-                  {/* Price */}
-                  <div>
+                  <input
+                    type="number"
+                    name="variants[0].price"
+                    value={formik.values.variants[0].price}
+                    onChange={formik.handleChange}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
+                </div>
 
-                    <label className="mb-2 block text-sm font-medium">
-                      Price
-                    </label>
+                {/* Discount Price */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Discount Price
+                  </label>
 
-                    <input
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          price: e.target.value,
-                        })
-                      }
-                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
-                    />
+                  <input
+                    type="number"
+                    name="variants[0].discountPrice"
+                    value={formik.values.variants[0].discountPrice}
+                    onChange={formik.handleChange}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
+                </div>
 
-                  </div>
+                {/* Stock */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Stock
+                  </label>
 
-                  {/* Stock */}
-                  <div>
+                  <input
+                    type="number"
+                    name="variants[0].stock"
+                    value={formik.values.variants[0].stock}
+                    onChange={formik.handleChange}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
+                </div>
 
-                    <label className="mb-2 block text-sm font-medium">
-                      Stock
-                    </label>
+                {/* Size */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Size Id
+                  </label>
 
-                    <input
-                      type="number"
-                      value={formData.stock}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          stock: e.target.value,
-                        })
-                      }
-                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
-                    />
+                  <input
+                    type="text"
+                    name="variants[0].sizeId"
+                    value={formik.values.variants[0].sizeId}
+                    onChange={formik.handleChange}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
+                </div>
 
-                  </div>
+                {/* Color */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Color Id
+                  </label>
 
-                  <div className="md:col-span-2">
-                    <label className="mb-2 block text-sm font-medium">
-                      Product Image
-                    </label>
+                  <input
+                    type="text"
+                    name="variants[0].colorId"
+                    value={formik.values.variants[0].colorId}
+                    onChange={formik.handleChange}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
+                </div>
 
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                {/* Description */}
+                <div className="md:col-span-2">
+                  <label className="mb-2 block text-sm font-medium">
+                    Description
+                  </label>
 
-                      {/* Preview */}
-                      <div className="h-28 w-28 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+                  <textarea
+                    rows={4}
+                    name="description"
+                    value={formik.values.description}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                  />
 
-                        {previewImage ? (
-                          <img
-                            src={previewImage}
-                            alt="Preview"
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center text-xs text-gray-400">
-                            No Image
-                          </div>
-                        )}
+                  {formik.touched.description &&
+                    formik.errors.description && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {formik.errors.description}
+                      </p>
+                    )}
+                </div>
 
-                      </div>
+                {/* Thumbnail */}
+                <div className="md:col-span-2">
+                  <label className="mb-2 block text-sm font-medium">
+                    Thumbnail
+                  </label>
 
-                      {/* Upload Button */}
-                      <label className="cursor-pointer rounded-2xl border border-[#DB4444] px-5 py-3 text-sm font-medium text-[#DB4444] transition hover:bg-[#DB4444] hover:text-white">
+                  <div className="flex items-center gap-4">
 
-                        Upload Photo
-
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
+                    <div className="h-28 w-28 overflow-hidden rounded-xl border">
+                      {previewImage ? (
+                        <img
+                          src={previewImage}
+                          alt="preview"
+                          className="h-full w-full object-cover"
                         />
-
-                      </label>
-
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm text-gray-400">
+                          No Image
+                        </div>
+                      )}
                     </div>
-                  </div>
 
-                  {/* Status */}
-                  <div className="md:col-span-2">
+                    <label className="cursor-pointer rounded-xl border border-[#DB4444] px-5 py-3 text-[#DB4444] hover:bg-[#DB4444] hover:text-white">
 
-                    <label className="mb-2 block text-sm font-medium">
-                      Status
+                      Upload Image
+
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+
+                          if (!file) return;
+
+                          const url = URL.createObjectURL(file);
+
+                          setPreviewImage(url);
+
+                          formik.setFieldValue(
+                            "thumbnail",
+                            file
+                          );
+
+                          formik.setFieldValue(
+                            "images[0].image",
+                            file
+                          );
+                        }}
+                      />
+
                     </label>
-
-                    <select
-                      value={formData.status}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          status: e.target.value,
-                        })
-                      }
-                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
-                    >
-                      <option value="IN_STOCK">
-                        In Stock
-                      </option>
-
-                      <option value="OUT_OF_STOCK">
-                        Out Of Stock
-                      </option>
-                    </select>
-
                   </div>
-
-                </div>
-
-                {/* Footer */}
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
-
-                  <button
-                    onClick={() =>
-                      setIsModalOpen(false)
-                    }
-                    className="rounded-2xl border border-gray-200 px-6 py-3 font-medium"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    onClick={handleSaveProduct}
-                    className="rounded-2xl bg-[#DB4444] px-6 py-3 font-medium text-white transition hover:opacity-90"
-                  >
-                    {editingProduct
-                      ? "Update Product"
-                      : "Add Product"}
-                  </button>
-
                 </div>
 
               </div>
-            </div>
+
+              {/* Footer */}
+              <div className="mt-8 flex justify-end gap-3">
+
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="rounded-xl border px-6 py-3"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="rounded-xl bg-[#DB4444] px-6 py-3 text-white"
+                >
+                  {editingProduct
+                    ? "Update Product"
+                    : "Add Product"}
+                </button>
+
+              </div>
+
+            </form>
 
           </div>
+        </div>
         )
       }
     </div>
