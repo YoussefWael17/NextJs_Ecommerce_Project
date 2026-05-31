@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+
 import {
   faBox,
   faBoxesStacked,
@@ -12,6 +13,8 @@ import {
   faTrash,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
+import { toast } from "sonner";
 
 type ProductStatus = "IN_STOCK" | "OUT_OF_STOCK";
 
@@ -23,16 +26,127 @@ interface Product {
   stock: number;
   createdAt: string;
   status: ProductStatus;
+  image: string;
 }
 
 export default function AdminProductsPage() {
-  const [products] = useState<Product[]>([
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [previewImage, setPreviewImage] = useState("");
+
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const handleImageUpload = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    const imageUrl = URL.createObjectURL(file);
+
+    setPreviewImage(imageUrl);
+
+    setFormData({
+      ...formData,
+      image: imageUrl,
+    });
+  };
+
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "",
+    price: "",
+    stock: "",
+    image: "",
+    status: "IN_STOCK",
+  });
+
+  const handleAddProduct = () => {
+    setEditingProduct(null);
+    setPreviewImage("");
+
+    setFormData({
+      name: "",
+      category: "",
+      price: "",
+      stock: "",
+      image: '',
+      status: "IN_STOCK",
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const handleEditProduct = (product: Product) => {
+
+    setEditingProduct(product);
+
+    setPreviewImage(product.image);
+
+    setFormData({
+      name: product.name,
+      category: product.category,
+      price: String(product.price),
+      stock: String(product.stock),
+      image: product.image,
+      status: product.status,
+    });
+
+    setIsModalOpen(true);
+  };
+
+  const handleSaveProduct = () => {
+
+  if (editingProduct) {
+
+    setProducts((prev) =>
+      prev.map((item) =>
+        item.id === editingProduct.id
+          ? {
+              ...item,
+              name: formData.name,
+              category: formData.category,
+              price: Number(formData.price),
+              stock: Number(formData.stock),
+              image: formData.image,
+              status: formData.status as ProductStatus,
+            }
+          : item
+      )
+    );
+    toast.success("Update Product Successfully")
+
+  } else {
+
+    const newProduct: Product = {
+      id: crypto.randomUUID(),
+      name: formData.name,
+      category: formData.category,
+      price: Number(formData.price),
+      stock: Number(formData.stock),
+      status: formData.status as ProductStatus,
+      createdAt: new Date().toISOString(),
+      image: formData.image
+    };
+
+    setProducts((prev) => [newProduct, ...prev]);
+
+    toast.success("Product Added Successfully")
+  }
+
+  setIsModalOpen(false);
+};
+
+  const [products, setProducts] = useState<Product[]>([
     {
       id: "1",
       name: "Gaming Laptop",
       category: "Electronics",
       price: 1200,
       stock: 15,
+      image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
       createdAt: "2025-07-20",
       status: "IN_STOCK",
     },
@@ -42,6 +156,7 @@ export default function AdminProductsPage() {
       category: "Accessories",
       price: 180,
       stock: 8,
+      image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
       createdAt: "2025-07-18",
       status: "IN_STOCK",
     },
@@ -51,6 +166,7 @@ export default function AdminProductsPage() {
       category: "Wearables",
       price: 250,
       stock: 0,
+      image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
       createdAt: "2025-07-15",
       status: "OUT_OF_STOCK",
     },
@@ -60,6 +176,7 @@ export default function AdminProductsPage() {
       category: "Accessories",
       price: 90,
       stock: 20,
+      image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
       createdAt: "2025-07-10",
       status: "IN_STOCK",
     },
@@ -89,7 +206,9 @@ export default function AdminProductsPage() {
   );
 
   return (
+    
     <div className="space-y-6 lg:space-y-8">
+      
       {/* Header */}
       <div className="flex flex-col gap-4 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6 lg:flex-row lg:items-center lg:justify-between">
         <div>
@@ -102,7 +221,7 @@ export default function AdminProductsPage() {
           </p>
         </div>
 
-        <button className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#DB4444] bg-[#DB4444] px-5 py-3 text-sm font-semibold text-white shadow transition duration-300 hover:bg-white hover:text-[#DB4444] sm:w-fit">
+        <button onClick={handleAddProduct} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#DB4444] bg-[#DB4444] px-5 py-3 text-sm font-semibold text-white shadow transition duration-300 hover:bg-white hover:text-[#DB4444] sm:w-fit">
           <FontAwesomeIcon icon={faPlus} />
           Add New Product
         </button>
@@ -214,8 +333,18 @@ export default function AdminProductsPage() {
                 >
                   <td className="rounded-l-2xl px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#DB4444] text-white font-bold">
-                        {product.name.charAt(0)}
+            
+                      <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-gray-200">
+                        <Image
+                          src={
+                            product.image && product.image.trim()
+                              ? product.image
+                              : "/product-placeholder.jpg"
+                          }
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                        />
                       </div>
 
                       <div>
@@ -256,7 +385,7 @@ export default function AdminProductsPage() {
 
                   <td className="rounded-r-2xl px-4 py-4">
                     <div className="flex items-center gap-3">
-                      <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 hover:border-[#DB4444] hover:text-[#DB4444]">
+                      <button onClick={() => handleEditProduct(product)} className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 hover:border-[#DB4444] hover:text-[#DB4444]">
                         <FontAwesomeIcon icon={faPenToSquare} />
                       </button>
 
@@ -279,8 +408,17 @@ export default function AdminProductsPage() {
               className="rounded-3xl border border-gray-200 bg-gray-50 p-4"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#DB4444] text-white font-bold">
-                  {product.name.charAt(0)}
+                <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-gray-200">
+                  <Image
+                    src={
+                      product.image && product.image.trim()
+                        ? product.image
+                        : "/product-placeholder.jpg"
+                    }
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
 
                 <div>
@@ -314,7 +452,7 @@ export default function AdminProductsPage() {
                 </span>
 
                 <div className="flex gap-3 pt-2">
-                  <button className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 hover:border-[#DB4444] hover:text-[#DB4444]">
+                  <button onClick={() => handleEditProduct(product)} className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 hover:border-[#DB4444] hover:text-[#DB4444]">
                     <FontAwesomeIcon icon={faPenToSquare} />
                     Edit
                   </button>
@@ -329,6 +467,221 @@ export default function AdminProductsPage() {
           ))}
         </div>
       </div>
+
+      {
+        isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 ">
+
+            <div className="flex min-h-full items-center justify-center  w-full md:w-fit">
+              <div className="w-full rounded-3xl bg-white p-6 shadow-xl">
+
+                {/* Header */}
+                <div className="mb-6 flex items-center justify-between mt-40 md:mt-0 ">
+
+                  <h2 className="text-2xl font-bold text-black">
+                    {editingProduct
+                      ? "Edit Product"
+                      : "Add Product"}
+                  </h2>
+
+                  <button
+                    onClick={() =>
+                      setIsModalOpen(false)
+                    }
+                    className="text-2xl text-gray-400 hover:text-red-500"
+                  >
+                    ×
+                  </button>
+
+                </div>
+
+                {/* Form */}
+                <div className="grid gap-4 md:grid-cols-2">
+
+                  {/* Name */}
+                  <div>
+
+                    <label className="mb-2 block text-sm font-medium">
+                      Product Name
+                    </label>
+
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          name: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                    />
+
+                  </div>
+
+                  {/* Category */}
+                  <div>
+
+                    <label className="mb-2 block text-sm font-medium">
+                      Category
+                    </label>
+
+                    <input
+                      type="text"
+                      value={formData.category}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          category: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                    />
+
+                  </div>
+
+                  {/* Price */}
+                  <div>
+
+                    <label className="mb-2 block text-sm font-medium">
+                      Price
+                    </label>
+
+                    <input
+                      type="number"
+                      value={formData.price}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          price: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                    />
+
+                  </div>
+
+                  {/* Stock */}
+                  <div>
+
+                    <label className="mb-2 block text-sm font-medium">
+                      Stock
+                    </label>
+
+                    <input
+                      type="number"
+                      value={formData.stock}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          stock: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                    />
+
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="mb-2 block text-sm font-medium">
+                      Product Image
+                    </label>
+
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+
+                      {/* Preview */}
+                      <div className="h-28 w-28 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+
+                        {previewImage ? (
+                          <img
+                            src={previewImage}
+                            alt="Preview"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs text-gray-400">
+                            No Image
+                          </div>
+                        )}
+
+                      </div>
+
+                      {/* Upload Button */}
+                      <label className="cursor-pointer rounded-2xl border border-[#DB4444] px-5 py-3 text-sm font-medium text-[#DB4444] transition hover:bg-[#DB4444] hover:text-white">
+
+                        Upload Photo
+
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                        />
+
+                      </label>
+
+                    </div>
+                  </div>
+
+                  {/* Status */}
+                  <div className="md:col-span-2">
+
+                    <label className="mb-2 block text-sm font-medium">
+                      Status
+                    </label>
+
+                    <select
+                      value={formData.status}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          status: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#DB4444]"
+                    >
+                      <option value="IN_STOCK">
+                        In Stock
+                      </option>
+
+                      <option value="OUT_OF_STOCK">
+                        Out Of Stock
+                      </option>
+                    </select>
+
+                  </div>
+
+                </div>
+
+                {/* Footer */}
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
+
+                  <button
+                    onClick={() =>
+                      setIsModalOpen(false)
+                    }
+                    className="rounded-2xl border border-gray-200 px-6 py-3 font-medium"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={handleSaveProduct}
+                    className="rounded-2xl bg-[#DB4444] px-6 py-3 font-medium text-white transition hover:opacity-90"
+                  >
+                    {editingProduct
+                      ? "Update Product"
+                      : "Add Product"}
+                  </button>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        )
+      }
     </div>
   );
 }

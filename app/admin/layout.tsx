@@ -5,17 +5,8 @@ import { useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import {
-  faBars,
-  faXmark,
-  faChartLine,
-  faUsers,
-  faCartShopping,
-  faBoxOpen,
-  faGear,
-  faTableColumns,
-  faBell,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBars, faXmark, faChartLine, faUsers, faCartShopping, faBoxOpen, faGear, faTableColumns, faBell } from "@fortawesome/free-solid-svg-icons";
+import { usePathname } from "next/navigation";
 
 export default function AdminLayout({
   children,
@@ -24,6 +15,8 @@ export default function AdminLayout({
 }) {
   const [open, setOpen] = useState(false);
 
+  const pathname = usePathname();
+  
   const linkClass =
     "flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-red-50 hover:text-[#DB4444] transition-all duration-200";
 
@@ -76,6 +69,18 @@ export default function AdminLayout({
       ],
     },
   ];
+
+  // const isActive = (href: string) => {
+  //   return pathname === href || pathname.startsWith(href + "/");
+  // };
+
+  const isActive = (href: string) => {
+    if (href === "/admin") {
+      return pathname === "/admin";
+    }
+
+    return pathname.startsWith(href);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -166,7 +171,11 @@ export default function AdminLayout({
                       key={idx}
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className={linkClass}
+                      className={`${linkClass} ${
+                        isActive(link.href)
+                          ? "bg-red-50 text-[#DB4444] font-semibold"
+                          : ""
+                      }`}
                     >
 
                       <FontAwesomeIcon icon={link.icon} />
@@ -211,7 +220,11 @@ export default function AdminLayout({
                     <Link
                       key={idx}
                       href={link.href}
-                      className={linkClass}
+                      className={`${linkClass} ${
+                        isActive(link.href)
+                          ? "bg-red-50 text-[#DB4444] font-semibold"
+                          : ""
+                      }`}
                     >
 
                       <FontAwesomeIcon icon={link.icon} />
