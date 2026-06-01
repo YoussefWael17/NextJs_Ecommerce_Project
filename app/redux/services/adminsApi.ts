@@ -76,6 +76,32 @@ export interface Product {
 }
 
 
+export enum AuthProvider {
+  CREDENTIALS = 'CREDENTIALS',
+  GOOGLE = 'GOOGLE',
+}
+
+export enum Role {
+  CUSTOMER = 'CUSTOMER',
+  ADMIN = 'ADMIN',
+  SELLER = 'SELLER',
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  createdAt: string;
+}
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  VENDOR = 'VENDOR',
+  CUSTOMER = 'CUSTOMER',
+}
+
+
 export const adminsApi = createApi({
   reducerPath: "adminsApi",
 
@@ -141,6 +167,23 @@ export const adminsApi = createApi({
         invalidatesTags: ["Admins"],
     }),
 
+    getUsers: builder.query<User[], void>({
+        query: () => "users",
+        providesTags: ["Admins"],
+    }),
+
+    updateRole: builder.mutation<User, { id: string; role: UserRole }>({
+      query: ({ id, role }) => ({
+        url: `users/${id}/role`,
+        method: "PATCH",
+        body: {
+          role,
+        },
+      }),
+
+      invalidatesTags: ["Admins"],
+    }),
+
   }),
 });
 
@@ -149,4 +192,6 @@ export const {
   useAddProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useGetUsersQuery,
+  useUpdateRoleMutation,
 } = adminsApi;

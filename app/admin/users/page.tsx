@@ -1,128 +1,84 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import axios from "axios";
+import { useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { useGetUsersQuery, useUpdateRoleMutation, UserRole, User } from "@/app/redux/services/adminsApi";
 
-import {
-  faUsers,
-  faUserShield,
-  faUser,
-  faMagnifyingGlass,
-  faPenToSquare,
-  faTrash,
-  faUserPlus,
-} from "@fortawesome/free-solid-svg-icons";
 
-type UserRole = "ADMIN" | "VENDOR" | "CUSTOMER";
+import { faUsers, faUserShield, faUser, faMagnifyingGlass, faPenToSquare, faTrash, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { useFormik } from "formik";
+import { User, UserRole } from "@/app/redux/services/adminsApi";
 
-type UserStatus = "ACTIVE" | "BLOCKED";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  createdAt: string;
-  status?: UserStatus;
-}
 
 export default function AdminUsersPage() {
 
-//   const [users, setUsers] = useState<User[]>([]);
-//   const [loading, setLoading] = useState(true);
+  const initialUsers: User[] = [
+  {
+    id: "1",
+    name: "Admin User",
+    email: "admin@shop.com",
+    role: UserRole.ADMIN,
+    createdAt: "2026-05-27T23:06:56.538Z",
+  },
+  {
+    id: "2",
+    name: "Youssef Wael",
+    email: "youssef.wael9906@gmail.com",
+    role: UserRole.VENDOR,
+    createdAt: "2026-05-29T04:53:12.273Z",
+  },
+  {
+    id: "3",
+    name: "Test User",
+    email: "test@test.com",
+    role: UserRole.CUSTOMER,
+    createdAt: "2026-05-30T10:15:00.000Z",
+  },
+];
 
-//   const token =
-//     typeof window !== "undefined"
-//       ? localStorage.getItem("token")
-//       : null;
+  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: "a0e4e63d-bca9-4470-b762-cfd0fdcfb16d",
-      name: "Ahmed Ali",
-      email: "ahmed@example.com",
-      role: "ADMIN",
-      createdAt: "2 hours ago",
-      status: "ACTIVE",
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  const formik = useFormik({
+    initialValues: {
+      id: "",
+      name: "",
+      email: "",
+      role: "CUSTOMER" as UserRole,
+      createdAt: "",
     },
-    {
-      id: "bf43fe05-f824-4cc2-9096-ad0c05306995",
-      name: "Sara Mohamed",
-      email: "sara@example.com",
-      role: "VENDOR",
-      createdAt: "5 hours ago",
-      status: "ACTIVE",
+
+    onSubmit: async (values) => {
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === values.id
+            ? {
+                ...user,
+                role: values.role,
+              }
+            : user
+        )
+      );
+
+      setIsEditUserModalOpen(false);
     },
-    {
-      id: "bf43fe05-f824-4cn2-9096-ad0c05301995",
-      name: "Omar Khaled",
-      email: "omar@example.com",
-      role: "CUSTOMER",
-      createdAt: "1 day ago",
-      status: "BLOCKED",
-    },
-    {
-      id: "bf73fe05-f824-4cn2-9096-ad0c05301995",
-      name: "Mariam Adel",
-      email: "mariam@example.com",
-      role: "CUSTOMER",
-      createdAt: "2 days ago",
-      status: "ACTIVE",
-    },
-  ]);
+  });
 
-//   const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZTI3ZjgwMy1hOTJmLTRkMTQtOWQxOC04MTc4YzBjMDAxZmQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Nzk5MjU5NjcsImV4cCI6MTc4MDUzMDc2N30.0vyiKXYMKGRmNVLn45GZdc-NZ_XNXJMd84yS9NKS3DM";
+  const totalUsers = users.length;
 
-//   async function getUsersByAdmin() {
+  const adminAndVendors = users.filter(
+    (user) =>
+      user.role === "ADMIN" ||
+      user.role === "VENDOR"
+  ).length;
 
-//     try {
-
-//       setLoading(true);
-
-//       const { data } = await axios.get(
-//         `${process.env.NEXT_PUBLIC_API_URL}/admin/users`,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         }
-//       );
-
-//       setUsers(data);
-
-//     } catch (error) {
-
-//       console.log(error);
-
-//     } finally {
-
-//       setLoading(false);
-
-//     }
-
-//   }
-
-//   useEffect(() => {
-//     getUsersByAdmin();
-//   }, []);
-
-  const handleRoleChange = (
-    id: string,
-    role: UserRole
-  ) => {
-
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === id
-          ? { ...user, role }
-          : user
-      )
-    );
-
-  };
+  const customers = users.filter(
+    (user) => user.role === "CUSTOMER"
+  ).length;
 
   const formatDate = (date: string) => {
 
@@ -137,28 +93,99 @@ export default function AdminUsersPage() {
 
   };
 
+  const handleEditUser = (user: User) => {
+    formik.setValues({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+    });
 
-  const totalUsers = users.length;
+    setSelectedUser(user);
+    setIsEditUserModalOpen(true);
+  };
 
-  const adminAndVendors = users.filter(
-    (user) =>
-      user.role === "ADMIN" ||
-      user.role === "VENDOR"
-  ).length;
 
-  const customers = users.filter(
-    (user) => user.role === "CUSTOMER"
-  ).length;
+  //RTK Api Calling
+  // const { data: users = [], isLoading  } = useGetUsersQuery();
+  // const [updateRole, { isLoading: isUpdating }] = useUpdateRoleMutation();
 
-//   if (loading) {
-//     return (
-//       <div className="flex h-[60vh] items-center justify-center">
-//         <p className="text-lg font-medium text-gray-500">
-//           Loading Users...
-//         </p>
-//       </div>
-//     );
-//   }
+  // const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  // const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  // const formik = useFormik({
+  //   initialValues: {
+  //     id: "",
+  //     name: "",
+  //     email: "",
+  //     role: "CUSTOMER" as UserRole,
+  //     createdAt: "",
+  //   },
+
+  // onSubmit: async (values) => {
+  //   try {
+  //     await updateRole({
+  //       id: values.id,
+  //       role: values.role,
+  //     }).unwrap();
+
+  //     setIsEditUserModalOpen(false);
+  //     } catch (error) {
+  //     console.error(error);
+  //     }
+  //   },
+  // });
+
+  // const handleEditUser = (user: User) => {
+  //   formik.setValues({
+  //     id: user.id,
+  //     name: user.name,
+  //     email: user.email,
+  //     role: user.role,
+  //     createdAt: user.createdAt,
+  //   });
+
+  //   setSelectedUser(user);
+  //   setIsEditUserModalOpen(true);
+  // };
+
+  // const formatDate = (date: string) => {
+
+  //   return new Date(date).toLocaleDateString(
+  //     "en-GB",
+  //     {
+  //       day: "2-digit",
+  //       month: "short",
+  //       year: "numeric",
+  //     }
+  //   );
+
+  // };
+
+  // const totalUsers = users.length;
+
+  // const adminAndVendors = users.filter(
+  //   (user) =>
+  //     user.role === "ADMIN" ||
+  //     user.role === "VENDOR"
+  // ).length;
+
+  // const customers = users.filter(
+  //   (user) => user.role === "CUSTOMER"
+  // ).length;
+
+  
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <p className="text-lg font-medium text-gray-500">
+          Loading Users...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -370,71 +397,20 @@ export default function AdminUsersPage() {
 
                     <div className="relative w-fit">
 
-                      <select
-                        value={user.role}
-                        onChange={(e) =>
-                          handleRoleChange(
-                            user.id,
-                            e.target.value as UserRole
-                          )
-                        }
-                        className="
-                        appearance-none
-                        rounded-xl
-                        border
-                        border-gray-200
-                        bg-white
-                        py-2
-                        pl-4
-                        pr-10
-                        text-sm
-                        font-medium
-                        text-gray-700
-                        outline-none
-                        transition
-                        focus:border-[#DB4444]
-                        focus:ring-2
-                        focus:ring-red-100
-                        cursor-pointer
-                        "
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          user.role === "CUSTOMER"
+                            ? "bg-green-100 text-green-600"
+                            : user.role === "VENDOR"
+                            ? "bg-blue-100 text-blue-600"
+                            : user.role === "ADMIN"
+                            ? "bg-red-100 text-red-600"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
                       >
-
-                        <option value="ADMIN">
-                          ADMIN
-                        </option>
-
-                        <option value="VENDOR">
-                          VENDOR
-                        </option>
-
-                        <option value="CUSTOMER">
-                          CUSTOMER
-                        </option>
-
-                      </select>
-
-                      {/* Arrow */}
-                      <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19 9l-7 7-7-7"
-                          />
-
-                        </svg>
-
-                      </div>
-
+                        {user.role}
+                      </span>
+                    
                     </div>
 
                   </td>
@@ -449,27 +425,9 @@ export default function AdminUsersPage() {
                   {/* Status */}
                   <td className="px-4 py-4">
 
-                    {user.status ? (
-
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                          user.status === "ACTIVE"
-                            ? "bg-green-100 text-green-600"
-                            : "bg-red-100 text-red-600"
-                        }`}
-                      >
-
-                        {user.status}
-
-                      </span>
-
-                    ) : (
-
                       <span className="text-sm text-gray-400">
                         N/A
                       </span>
-
-                    )}
 
                   </td>
 
@@ -478,7 +436,10 @@ export default function AdminUsersPage() {
 
                     <div className="flex items-center gap-3">
 
-                      <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 transition hover:border-[#DB4444] hover:text-[#DB4444]">
+                      <button
+                        type="button"
+                        onClick={() => handleEditUser(user)}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-600 transition hover:border-[#DB4444] hover:text-[#DB4444]">
 
                         <FontAwesomeIcon icon={faPenToSquare} />
 
@@ -543,71 +504,19 @@ export default function AdminUsersPage() {
 
                   <div className="relative w-full">
 
-                      <select
-                        value={user.role}
-                        onChange={(e) =>
-                          handleRoleChange(
-                            user.id,
-                            e.target.value as UserRole
-                          )
-                        }
-                        className="
-                        appearance-none
-                        rounded-xl
-                        border
-                        border-gray-200
-                        bg-white
-                        py-2
-                        pl-4
-                        pr-10
-                        text-sm
-                        font-medium
-                        text-gray-700
-                        outline-none
-                        transition
-                        focus:border-[#DB4444]
-                        focus:ring-2
-                        focus:ring-red-100
-                        cursor-pointer
-                        w-full
-                        "
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          user.role === "CUSTOMER"
+                            ? "bg-green-100 text-green-600"
+                            : user.role === "VENDOR"
+                            ? "bg-blue-100 text-blue-600"
+                            : user.role === "ADMIN"
+                            ? "bg-red-100 text-red-600"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
                       >
-
-                        <option value="ADMIN">
-                          ADMIN
-                        </option>
-
-                        <option value="VENDOR">
-                          VENDOR
-                        </option>
-
-                        <option value="CUSTOMER">
-                          CUSTOMER
-                        </option>
-
-                      </select>
-
-                      {/* Arrow */}
-                      <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 text-gray-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19 9l-7 7-7-7"
-                          />
-
-                        </svg>
-
-                      </div>
+                        {user.role}
+                      </span>
 
                     </div>
                 </div>
@@ -624,38 +533,22 @@ export default function AdminUsersPage() {
                     </p>
                   </div>
 
-                  {user.status ? (
-
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                          user.status === "ACTIVE"
-                            ? "bg-green-100 text-green-600"
-                            : "bg-red-100 text-red-600"
-                        }`}
-                      >
-
-                        {user.status}
-
-                      </span>
-
-                    ) : (
-
-                      <span className="text-sm text-gray-400">
-                        N/A
-                      </span>
-
-                    )}
+                  <span className="text-sm text-gray-400">
+                    N/A
+                  </span>
 
                 </div>
 
                 {/* Actions */}
                 <div className="flex items-center gap-3 pt-2">
 
-                  <button className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:border-[#DB4444] hover:text-[#DB4444]">
-
+                  <button
+                    type="button"
+                    onClick={() => handleEditUser(user)}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:border-[#DB4444] hover:text-[#DB4444]"
+                  >
                     <FontAwesomeIcon icon={faPenToSquare} />
                     Edit
-
                   </button>
 
                   <button className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:border-red-500 hover:text-red-500">
@@ -677,6 +570,190 @@ export default function AdminUsersPage() {
 
       </div>
 
+      {
+        isEditUserModalOpen && selectedUser && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-xl">
+
+              <form onSubmit={formik.handleSubmit}>
+
+                {/* Header */}
+                <div className="mb-6 flex items-center justify-between">
+                  <h2 className="text-2xl font-bold">
+                    Edit User
+                  </h2>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsEditUserModalOpen(false)}
+                    className="text-3xl text-gray-400 hover:text-red-500"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {/* Fields */}
+                <div className="grid gap-4 md:grid-cols-2">
+
+                  {/* Name */}
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Name
+                    </label>
+
+                    <input
+                      type="text"
+                      value={formik.values.name}
+                      disabled
+                      className="w-full rounded-2xl border border-gray-200 bg-gray-100 px-4 py-3 text-gray-500"
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Email
+                    </label>
+
+                    <input
+                      type="email"
+                      value={formik.values.email}
+                      disabled
+                      className="w-full rounded-2xl border border-gray-200 bg-gray-100 px-4 py-3 text-gray-500"
+                    />
+                  </div>
+
+                  {/* User ID */}
+                  <div className="md:col-span-2">
+                    <label className="mb-2 block text-sm font-medium">
+                      User ID
+                    </label>
+
+                    <input
+                      type="text"
+                      value={formik.values.id}
+                      disabled
+                      className="w-full rounded-2xl border border-gray-200 bg-gray-100 px-4 py-3 text-gray-500"
+                    />
+                  </div>
+
+                  {/* Created At */}
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Created At
+                    </label>
+
+                    <input
+                      type="text"
+                      value={new Date(
+                        formik.values.createdAt
+                      ).toLocaleDateString()}
+                      disabled
+                      className="w-full rounded-2xl border border-gray-200 bg-gray-100 px-4 py-3 text-gray-500"
+                    />
+                  </div>
+
+                  {/* Role */}
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Role
+                    </label>
+
+                    <div className="relative w-full">
+                      <select
+                      name="role"
+                      value={formik.values.role}
+                      onChange={formik.handleChange}
+                      className="
+                        w-full
+                        appearance-none
+                        rounded-xl
+                         border
+                         border-gray-200
+                         bg-white
+                         py-3
+                         pl-4
+                         pr-10
+                         text-sm
+                         font-medium
+                         text-gray-700
+                         outline-none
+                         transition
+                         focus:border-[#DB4444]
+                         focus:ring-2
+                         focus:ring-red-100
+                         cursor-pointer"
+                    >
+                      <option value="CUSTOMER">
+                        Customer
+                      </option>
+
+                      <option value="VENDOR">
+                        Vendor
+                      </option>
+
+                      <option value="ADMIN">
+                        Admin
+                      </option>
+                    </select>
+
+                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19 9l-7 7-7-7"
+                          />
+
+                        </svg>
+
+                      </div>
+
+
+
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Footer */}
+                <div className="mt-8 flex justify-end gap-3">
+
+                  <button
+                    type="button"
+                    onClick={() => setIsEditUserModalOpen(false)}
+                    className="rounded-xl border px-6 py-3"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    // disabled={isUpdating}
+                    className="rounded-xl bg-[#DB4444] px-6 py-3 text-white"
+                  >
+                    {/* {isUpdating ? "Updating..." : "Update User"} */}
+                    Update User
+                  </button>
+
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+        )
+      }
+
     </div>
-  );
+  );  
 }
