@@ -1,10 +1,69 @@
 'use client'
 
+import axios from 'axios';
+import { useFormik } from 'formik';
 import Link from 'next/link'
-import React from 'react'
-import { FcGoogle } from "react-icons/fc";
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react'
+import * as Yup from 'yup';
 
 export default function SignInPage() {
+
+  const router = useRouter();
+  let [errors, setErrors] = useState(null)
+  const [isLoading, setIsLoading] = useState(false);
+
+  let validationSchema = Yup.object({
+    
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    
+    password: Yup.string()
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters")
+      .max(30, "Password must be at most 30 characters")
+      .matches(
+        /^[a-zA-Z0-9]{6,30}$/,
+        "Password must be 6-30 characters and contain only letters and numbers"
+      ),
+  });
+
+    async function handleLogin(values: any) {
+      try {
+        setErrors(null);
+        setIsLoading(true);
+
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+          values
+        );
+
+        // console.log(response);
+
+        // response?.status
+
+        if (response?.status === 200) {
+          console.log("Success");
+          router.push("/");
+        }
+      } catch (err: any) {
+        setErrors(err.response?.data);
+        console.log(errors)
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+      let formik = useFormik({
+        initialValues:{
+          email: "",
+          password: ""
+        },
+        validationSchema,
+        onSubmit: handleLogin
+      })
+
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
 
@@ -31,34 +90,49 @@ export default function SignInPage() {
           </p>
 
           {/* FORM */}
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={formik.handleSubmit}>
 
             {/* EMAIL */}
             <div>
               <input
+                name="email" value={formik.values.email} onChange={formik.handleChange} onBlur={formik.handleBlur}  
                 type="email"
                 placeholder="Enter Your Email"
                 className="w-full border-b border-gray-300 px-4 py-3 outline-none focus:border-black transition"
               />
+                {formik.errors.email && formik.touched.email ? (
+                  <div className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {formik.errors.email}
+                  </div> 
+                  ) : null
+                }
             </div>
 
             {/* PASSWORD */}
             <div>
               <input
+                name="password" value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}  
                 type="password"
                 placeholder="Enter Your Password"
                 className="w-full border-b border-gray-300 px-4 py-3 outline-none focus:border-black transition"
               />
+                {formik.errors.password && formik.touched.password ? (
+                  <div className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {formik.errors.password}
+                  </div> 
+                  ) : null
+                }
             </div>
 
             <div className="flex items-center justify-between gap-4 pt-4">
 
-              {/* CREATE ACCOUNT */}
+              {/* Log In ACCOUNT */}
               <button
                 type="submit"
+                disabled={isLoading}
                 className="w-[50%] rounded bg-[#DB4444] border border-[#DB4444] text-white py-3 hover:bg-white hover:text-[#DB4444] transition duration-300"
               >
-                Log In
+                {isLoading ? "Log In Account..." : "Log In"}
               </button>
 
               <Link

@@ -1,22 +1,93 @@
 'use client'
 
 import Link from 'next/link'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
 import Script from 'next/script';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import { useRouter } from 'next/navigation';
+
+
 
 export default function SignUpPage() {
+
+  const router = useRouter();
+  let [errors, setErrors] = useState(null)
+  const [isLoading, setIsLoading] = useState(false);
+
+  let validationSchema = Yup.object({
+    name: Yup.string()
+      .required("Name is required")
+      .min(3, "Minimum 3 characters"),
+
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    
+    password: Yup.string()
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters")
+      .max(30, "Password must be at most 30 characters")
+      .matches(
+        /^[a-zA-Z0-9]{6,30}$/,
+        "Password must be 6-30 characters and contain only letters and numbers"
+      ),
+
+    rePassword: Yup.string()
+      .required("Please confirm your password")
+      .oneOf([Yup.ref("password")], "Passwords must match"),
+  });
+
+    async function handleRegister(values: any) {
+      try {
+        setErrors(null);
+        setIsLoading(true);
+
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+          values
+        );
+
+        console.log(response);
+
+        response?.status
+
+        if (response?.status === 201) {
+          console.log("Success");
+          router.push("/sign-in");
+        }
+      } catch (err: any) {
+        setErrors(err.response?.data);
+        console.log(errors)
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+      let formik = useFormik({
+        initialValues:{
+          name: "",
+          email: "",
+          password: "",
+          rePassword: ""
+        },
+        validationSchema,
+        onSubmit: handleRegister
+      })
+
+
+
 
   const initialized = useRef(false)
 
   const handleResponse = async (response: any) => {
-  // console.log("ID TOKEN:", response.credential)
 
-  await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
-    token: response.credential  
-  })
-}
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
+      token: response.credential  
+    })
+  }
 
   useEffect(() => {
   const interval = setInterval(() => {
@@ -78,42 +149,70 @@ export default function SignUpPage() {
           </p>
 
           {/* FORM */}
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={formik.handleSubmit}>
 
             {/* NAME */}
             <div>
               <input
+                name="name" value={formik.values.name} onChange={formik.handleChange} onBlur={formik.handleBlur}  
                 type="text"
                 placeholder="Enter Your Name"
                 className="w-full border-b border-gray-300 px-4 py-3 outline-none focus:border-black transition"
               />
+                {formik.errors.name && formik.touched.name ? (
+                  <div className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {formik.errors.name}
+                  </div>
+                  ) : null
+                }
             </div>
 
             {/* EMAIL */}
             <div>
               <input
+                name="email" value={formik.values.email} onChange={formik.handleChange} onBlur={formik.handleBlur}  
                 type="email"
                 placeholder="Enter Your Email"
                 className="w-full border-b border-gray-300 px-4 py-3 outline-none focus:border-black transition"
               />
+                {formik.errors.email && formik.touched.email ? (
+                  <div className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {formik.errors.email}
+                  </div> 
+                  ) : null
+                }
             </div>
 
             {/* PASSWORD */}
             <div>
               <input
+                name="password" value={formik.values.password} onChange={formik.handleChange} onBlur={formik.handleBlur}  
                 type="password"
                 placeholder="Enter Your Password"
                 className="w-full border-b border-gray-300 px-4 py-3 outline-none focus:border-black transition"
               />
+                {formik.errors.password && formik.touched.password ? (
+                  <div className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {formik.errors.password}
+                  </div> 
+                  ) : null
+                }
             </div>
 
             {/* CONFIRM PASSWORD */}
             <div>
               <input
+                name="rePassword" value={formik.values.rePassword} onChange={formik.handleChange} onBlur={formik.handleBlur}  
                 type="password"
                 placeholder="Confirm your password"
                 className="w-full border-b border-gray-300 px-4 py-3 outline-none focus:border-black transition"
               />
+               {formik.errors.rePassword && formik.touched.rePassword ? (
+                  <div className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {formik.errors.rePassword}
+                  </div> 
+                  ) : null
+                }
             </div>
 
             <div className="space-y-3">
@@ -121,14 +220,16 @@ export default function SignUpPage() {
               {/* CREATE ACCOUNT */}
               <button
                 type="submit"
+                disabled={isLoading}
                 className="w-full rounded bg-[#DB4444] border border-[#DB4444] text-white py-3 hover:bg-white hover:text-[#DB4444] transition duration-300"
               >
-                Create Account
+                 {isLoading ? "Creating Account..." : "Create Account"}
               </button>
 
               {/* GOOGLE BUTTON */}
               <button
                 type="button"
+                disabled={isLoading}
                 onClick={() => {
                   const googleButton = document.querySelector(
                     '#google-hidden-btn div[role="button"]'

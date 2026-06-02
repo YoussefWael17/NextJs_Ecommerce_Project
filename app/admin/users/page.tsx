@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faUserShield, faUser, faMagnifyingGlass, faPenToSquare, faTrash, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { useFormik } from "formik";
 import { User, UserRole } from "@/app/redux/services/adminsApi";
+import AdminUsersPageSkeleton from "@/app/components/admin-users-skeleton";
 
 
 export default function AdminUsersPage() {
@@ -178,13 +179,7 @@ export default function AdminUsersPage() {
   
 
   if (isLoading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <p className="text-lg font-medium text-gray-500">
-          Loading Users...
-        </p>
-      </div>
-    );
+    return ( <AdminUsersPageSkeleton />);
   }
 
   return (
