@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,13 +9,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faUser } from "@fortawesome/free-regular-svg-icons";
 
 import { faMagnifyingGlass, faCartShopping, faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { authContext } from "../context/authContext";
 
 export default function Navbar() {
-  const isLoggedIn = false;
 
-  const pathname = usePathname();
+const auth = useContext(authContext);
 
-  const [isOpen, setIsOpen] = useState(false);
+const user = auth?.user ?? null;
+
+const isLoggedIn = !!user;
+
+const pathname = usePathname();
+const [isOpen, setIsOpen] = useState(false);
+
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -225,3 +231,5 @@ export default function Navbar() {
     </nav>
   );
 }
+
+

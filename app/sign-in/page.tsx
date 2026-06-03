@@ -39,9 +39,9 @@ export default function SignInPage() {
           values
         );
 
-        // console.log(response);
+        console.log(response.data.token);
 
-        // response?.status
+        localStorage.setItem("userToken", response.data.token)
 
         if (response?.status === 200) {
           console.log("Success");

@@ -50,12 +50,12 @@ export default function SignUpPage() {
           values
         );
 
-        console.log(response);
+        // console.log(response);
 
         response?.status
 
         if (response?.status === 201) {
-          console.log("Success");
+          // console.log("Success");
           router.push("/sign-in");
         }
       } catch (err: any) {

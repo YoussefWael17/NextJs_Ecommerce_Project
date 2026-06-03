@@ -8,6 +8,8 @@ import Footer from "./components/footer";
 import { Toaster } from "sonner";
 import Script from "next/script";
 import Providers from "./providers";
+import { AuthContextProvider } from "./context/authContext";
+
 
 
 config.autoAddCss = false;
@@ -37,6 +39,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      
+    <AuthContextProvider>
+
       <Providers>
       <body className="min-h-full flex flex-col">
 
@@ -68,6 +73,9 @@ export default function RootLayout({
         {/* {children} */}
       </body>
       </Providers>
+      
+    </AuthContextProvider>
+
     </html>
   );
 }
