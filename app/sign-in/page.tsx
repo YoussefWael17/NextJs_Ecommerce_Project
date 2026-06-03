@@ -4,10 +4,15 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import * as Yup from 'yup';
+import { authContext } from '../context/authContext';
+import { User } from '../redux/services/adminsApi';
+import { jwtDecode } from 'jwt-decode';
 
 export default function SignInPage() {
+
+  const auth = useContext(authContext);
 
   const router = useRouter();
   let [errors, setErrors] = useState(null)
@@ -39,13 +44,27 @@ export default function SignInPage() {
           values
         );
 
-        console.log(response.data.token);
+        // console.log(response.data.token);
 
         localStorage.setItem("userToken", response.data.token)
 
+        const decoded = jwtDecode<User>(response.data.token);
+
+        console.log(decoded)
+        
+        auth?.setUser(decoded);
+
         if (response?.status === 200) {
           console.log("Success");
-          router.push("/");
+          if (decoded.role === "ADMIN") {
+            return router.push("/admin");
+          }
+
+          if (decoded.role === "VENDOR") {
+            return router.push("/vendor");
+          }
+
+          return router.push("/");
         }
       } catch (err: any) {
         setErrors(err.response?.data);

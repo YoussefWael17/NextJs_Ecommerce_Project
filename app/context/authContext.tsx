@@ -26,6 +26,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }){
 
         try {
             const decoded = jwtDecode<User>(token);
+            console.log(decoded)
             setUser(decoded);
         } catch (error) {
             console.error("Invalid token", error);
