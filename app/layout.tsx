@@ -9,6 +9,7 @@ import { Toaster } from "sonner";
 import Script from "next/script";
 import Providers from "./providers";
 import { AuthContextProvider } from "./context/authContext";
+import { CartContextProvider } from "./context/cartContext";
 
 
 
@@ -41,39 +42,41 @@ export default function RootLayout({
     >
       
     <AuthContextProvider>
+      <CartContextProvider>
 
-      <Providers>
-      <body className="min-h-full flex flex-col">
+        <Providers>
+        <body className="min-h-full flex flex-col">
 
-        <div className="flex min-h-screen flex-col">
-          {/* Navbar */}
-          <Navbar />
+          <div className="flex min-h-screen flex-col">
+            {/* Navbar */}
+            <Navbar />
 
-          {/* Page Content */}
-          <main className="flex-1">
-            {children}
+            {/* Page Content */}
+            <main className="flex-1">
+              {children}
 
-            <Script
-              src="https://accounts.google.com/gsi/client"
-              strategy="afterInteractive"
+              <Script
+                src="https://accounts.google.com/gsi/client"
+                strategy="afterInteractive"
+              />
+            </main>
+
+            <Toaster
+              position="top-center"
+              richColors
+              closeButton
+              expand
             />
-          </main>
 
-          <Toaster
-            position="top-center"
-            richColors
-            closeButton
-            expand
-          />
+            {/* Footer */}
+            <Footer />
+          </div>
 
-          {/* Footer */}
-          <Footer />
-        </div>
-
-        {/* {children} */}
-      </body>
-      </Providers>
-      
+          {/* {children} */}
+        </body>
+        </Providers>
+        
+      </CartContextProvider>
     </AuthContextProvider>
 
     </html>
