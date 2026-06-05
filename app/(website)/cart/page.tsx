@@ -1,9 +1,9 @@
 "use client"
+import { CartItem } from '@/app/types/cart';
 import Link from 'next/link'
 import React, { useContext, useEffect, useState } from 'react'
 import { FaShoppingCart, FaTimes } from 'react-icons/fa'
-import { cartContext } from '../context/cartContext';
-import { CartItem } from '../types/cart';
+
 import { toast } from 'sonner';
 
 export default function CartPage() {

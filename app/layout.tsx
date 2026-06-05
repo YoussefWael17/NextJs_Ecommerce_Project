@@ -41,43 +41,52 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       
-    <AuthContextProvider>
-      <CartContextProvider>
-
-        <Providers>
+    
         <body className="min-h-full flex flex-col">
+          <AuthContextProvider>
+            <CartContextProvider>
 
-          <div className="flex min-h-screen flex-col">
-            {/* Navbar */}
-            <Navbar />
+                <Providers>
 
-            {/* Page Content */}
-            <main className="flex-1">
-              {children}
+                   {children}
 
-              <Script
-                src="https://accounts.google.com/gsi/client"
-                strategy="afterInteractive"
-              />
-            </main>
+                {/* <div className="flex min-h-screen flex-col">
+                 
+                  <Navbar />
 
-            <Toaster
-              position="top-center"
-              richColors
-              closeButton
-              expand
-            />
+                  
+                  <main className="flex-1">
+                    {children}
 
-            {/* Footer */}
-            <Footer />
-          </div>
+                    <Script
+                      src="https://accounts.google.com/gsi/client"
+                      strategy="afterInteractive"
+                    />
+                  </main>
+
+                  
+
+                  
+                  <Footer />
+                </div> */}
+
+                <Toaster
+                    position="top-center"
+                    richColors
+                    closeButton
+                    expand
+                  />
+
+                </Providers>
+
+                </CartContextProvider>
+          </AuthContextProvider>
 
           {/* {children} */}
         </body>
-        </Providers>
+    
         
-      </CartContextProvider>
-    </AuthContextProvider>
+      
 
     </html>
   );

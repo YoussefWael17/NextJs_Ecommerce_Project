@@ -1,12 +1,7 @@
+import { Category } from "@/app/types/category";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  image: string;
-  createdAt: string;
-}
+
 
 export interface Vendor {
   id: string;
@@ -123,7 +118,7 @@ export const adminsApi = createApi({
 
         headers.set(
             "authorization",
-            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZTI3ZjgwMy1hOTJmLTRkMTQtOWQxOC04MTc4YzBjMDAxZmQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Nzk5MjU5NjcsImV4cCI6MTc4MDUzMDc2N30.0vyiKXYMKGRmNVLn45GZdc-NZ_XNXJMd84yS9NKS3DM`
+            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZTI3ZjgwMy1hOTJmLTRkMTQtOWQxOC04MTc4YzBjMDAxZmQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODA2NzcyODcsImV4cCI6MTc4MTI4MjA4N30.S5gdl2yn0aPuJVKXmjJyOJDhKSrCCJLBjAt8ak8LCAg`
         );
 
         return headers;
@@ -184,6 +179,18 @@ export const adminsApi = createApi({
       invalidatesTags: ["Admins"],
     }),
 
+    createCategory: builder.mutation<Category, { data: FormData }>({
+        query: ({ data }) => ({
+            url: `categories/`,
+            method: "POST",
+            body: data,
+        }),
+
+        invalidatesTags: ["Admins"],
+    }),
+
+    
+
   }),
 });
 
@@ -194,4 +201,5 @@ export const {
   useDeleteProductMutation,
   useGetUsersQuery,
   useUpdateRoleMutation,
+  useCreateCategoryMutation
 } = adminsApi;

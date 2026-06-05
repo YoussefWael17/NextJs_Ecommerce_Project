@@ -8,7 +8,8 @@ import { faStar } from "@fortawesome/free-solid-svg-icons/faStar"
 import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
 import { faMinus, faPlus, faRotateLeft, faTruck, faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link"
-import ProductCard from "../components/product-card"
+import ProductCard from "@/app/components/product-card"
+
 
 export default function ProductDetails() {
 
@@ -81,7 +82,7 @@ export default function ProductDetails() {
 
   return (
     <div className="w-full py-4">
-      <div className="mx-auto max-w-screen-xl px-2 lg:px-4">
+      <div className="mx-auto max-w-7xl px-2 lg:px-4">
 
         {/* BREADCRUMB */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-10 mt-6">
@@ -221,7 +222,7 @@ export default function ProductDetails() {
           <div className="order-1 md:order-2 lg:col-span-5 bg-[#F5F5F5] flex items-center justify-center p-4">
             <img
               src={mainImage}
-              className="w-full max-h-[320px] object-contain hover:scale-105 transition"
+              className="w-full max-h-80 object-contain hover:scale-105 transition"
               alt=""
             />
           </div>
@@ -235,7 +236,7 @@ export default function ProductDetails() {
                 <div
                   key={i}
                   onClick={() => setMainImage(img)}
-                  className="w-full h-[120px] bg-[#F5F5F5] flex items-center justify-center cursor-pointer hover:border-[#DB4444] border border-[#F5F5F5] transition duration-300"
+                  className="w-full h-30 bg-[#F5F5F5] flex items-center justify-center cursor-pointer hover:border-[#DB4444] border border-[#F5F5F5] transition duration-300"
                 >
                   <img src={img} className="w-full h-full object-contain p-2 hover:scale-105 transition duration-300" />
                 </div>
@@ -247,7 +248,7 @@ export default function ProductDetails() {
               <div className="flex">
                 {images.map((img, i) => (
                   <div key={i} className="min-w-[50%] p-2">
-                    <div className="h-[120px] bg-[#F5F5F5] flex items-center justify-center">
+                    <div className="h-30 bg-[#F5F5F5] flex items-center justify-center">
                       <img src={img} className="w-full h-full object-contain p-2" />
                     </div>
                   </div>

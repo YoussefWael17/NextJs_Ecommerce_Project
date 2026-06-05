@@ -6,9 +6,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation';
 import React, { useContext, useState } from 'react'
 import * as Yup from 'yup';
-import { authContext } from '../context/authContext';
-import { User } from '../redux/services/adminsApi';
+
 import { jwtDecode } from 'jwt-decode';
+import { authContext } from '@/app/context/authContext';
+import { User } from '@/app/redux/services/adminsApi';
 
 export default function SignInPage() {
 

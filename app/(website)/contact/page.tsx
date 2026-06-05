@@ -8,7 +8,7 @@ import {
 
 export default function ContactPage() {
   return (
-    <div className="mx-auto mt-20 w-full max-w-screen-xl px-4 py-10 pb-26">
+    <div className="mx-auto mt-20 w-full max-w-7xl px-4 py-10 pb-26">
 
       {/* Breadcrumb */}
       <div className="mb-10 flex items-center gap-2 text-sm text-gray-500">
