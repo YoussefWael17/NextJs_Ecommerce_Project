@@ -189,6 +189,27 @@ export const adminsApi = createApi({
         invalidatesTags: ["Admins"],
     }),
 
+    updateCategory: builder.mutation<Category, { id: string; data: FormData }>({
+        query: ({ id, data }) => ({
+            url: `categories/${id}/`,
+            method: "PATCH",
+            body: data,
+        }),
+
+        invalidatesTags: ["Admins"],
+    }),
+
+    deleteCategory: builder.mutation<Category, { id: string }>({
+        query: ({ id }) => ({
+            url: `categories/${id}/`,
+            method: "DELETE"
+        }),
+
+        invalidatesTags: ["Admins"],
+    }),
+
+    
+
     
 
   }),
@@ -201,5 +222,7 @@ export const {
   useDeleteProductMutation,
   useGetUsersQuery,
   useUpdateRoleMutation,
-  useCreateCategoryMutation
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
 } = adminsApi;

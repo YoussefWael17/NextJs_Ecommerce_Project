@@ -9,3 +9,8 @@ export interface Category {
   image?: string
   products?: Product[]
 }
+
+export interface UpdateCategoryFormValues {
+  name: string;
+  image: File | null;
+}

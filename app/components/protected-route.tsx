@@ -27,7 +27,7 @@ export default function ProtectedRoute({ children, roles } : Props) {
   }, [auth, router, roles]);
 
   if (!auth || auth.loading) {
-    return <div>Loading...</div>;
+    return ;
   }
 
   if (!auth.user) {

@@ -1,14 +1,17 @@
 "use client"
 
 import * as Yup from "yup";
-// import { useCreateCategoryMutation } from "@/app/redux/services/adminsApi";
-// import { useGetCategoriesQuery } from "@/app/redux/services/categoriesApi";
-import { Category } from "@/app/types/category";
+import { Category, UpdateCategoryFormValues } from "@/app/types/category";
 import { faTags, faPlus, faMagnifyingGlass, faPenToSquare, faTrash, faBoxOpen,} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useFormik } from "formik";
-import { useState } from "react";
-// import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { useCreateCategoryMutation, useDeleteCategoryMutation, useUpdateCategoryMutation } from "@/app/redux/services/adminsApi";
+import { useGetCategoriesQuery } from "@/app/redux/services/categoriesApi";
+import { toast } from "sonner";
+import { getImageUrl } from "../utils/getImageUrl";
+import AdminCategoriesPageSkeleton from "@/app/components/skeletonUI/admin-categories-skeleton";
+
 
 const formatDate = (date: string) => {
 
@@ -56,136 +59,38 @@ const initialCategories: Category[] = [
 export default function CategoriesPage() {
 
   
-    const [categories, setCategories] = useState<Category[]>(initialCategories);
-    const [previewImage, setPreviewImage] = useState("");
-    const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
-    const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-
-
-    function handleAddCategory() {
-      setEditingCategory(null);
-
-      formik.resetForm();
-
-      setIsAddCategoryModalOpen(true);
-    }
-
-    function handleEditCategory(category: Category) {
-      setEditingCategory(category);
-
-      formik.setValues({
-        name: category.name,
-        image: null,
-      });
-
-      setIsEditCategoryModalOpen(true);
-    }
-
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      setPreviewImage(URL.createObjectURL(file));
-      formik.setFieldValue("image", file);
-    };
-
-    const validationSchema = Yup.object({
-      name: Yup.string()
-        .required("Name is required")
-        .min(3, "Name must be at least 3 characters"),
-
-      image: Yup.mixed().nullable().required("Image is required"),
-    });
-
-    const formik = useFormik({
-    initialValues: {
-      name: "",
-      image: null as File | null,
-    },
-    validationSchema,
-    onSubmit: (values) => {
-      console.log("SUBMIT WORKS", values);
-        if (editingCategory) {
-          setCategories((prev) =>
-            prev.map((cat) =>
-              cat.id === editingCategory.id
-                ? {
-                    ...cat,
-                    name: values.name,
-                    slug: values.name.toLowerCase(),
-                  }
-                : cat
-            )
-          );
-
-          setIsEditCategoryModalOpen(false);
-        } else {
-          const newCategory: Category = {
-            id: crypto.randomUUID(),
-            name: values.name,
-            slug: values.name.toLowerCase(),
-            description: "",
-            createdAt: new Date().toISOString(),
-          };
-
-          setCategories((prev) => [...prev, newCategory]);
-          setIsAddCategoryModalOpen(false);
-        }
-      }
-    });
-
-    
-    // RTK Api Calling
-    // const { data, isLoading } = useGetCategoriesQuery();
-    // const categories = data?.data ?? [];
-    // const [ createCategory ] = useCreateCategoryMutation(); 
-
+    // const [categories, setCategories] = useState<Category[]>(initialCategories);
     // const [previewImage, setPreviewImage] = useState("");
-    
     // const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
     // const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
+    // const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-    // const handleSubmit = async (
-    //   values: any
-    // ) => {
-    //   try {
-    //     const formData = new FormData();
 
-    //     formData.append(
-    //       "name",
-    //       values.name
-    //     );
+    // function handleAddCategory() {
+    //   setEditingCategory(null);
 
-    //     formData.append(
-    //       "image",
-    //       values.image
-    //     );
-        
-    //     await createCategory({
-    //       data: formData,
-    //     }).unwrap();
+    //   formik.resetForm();
 
-    //     toast.success("Category Added Successfully");
+    //   setIsAddCategoryModalOpen(true);
+    // }
 
-    //     setIsAddCategoryModalOpen(false);
-    //     setPreviewImage("");
-    //     formik.resetForm();
+    // function handleEditCategory(category: Category) {
+    //   setEditingCategory(category);
 
-        
+    //   formik.setValues({
+    //     name: category.name,
+    //     image: null,
+    //   });
 
-    //   } catch (err: any) {
-    //       console.log("FULL ERROR:", err);
+    //   setIsEditCategoryModalOpen(true);
+    // }
 
-    //       const message =
-    //         err?.data?.message ||
-    //         err?.error?.data?.message ||
-    //         err?.error?.message ||
-    //         err?.message ||
-    //         "Something went wrong";
+    // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //   const file = e.target.files?.[0];
+    //   if (!file) return;
 
-    //       toast.error(message);
-    //     }
+    //   setPreviewImage(URL.createObjectURL(file));
+    //   formik.setFieldValue("image", file);
     // };
 
     // const validationSchema = Yup.object({
@@ -193,35 +98,249 @@ export default function CategoriesPage() {
     //     .required("Name is required")
     //     .min(3, "Name must be at least 3 characters"),
 
-    //   image: Yup.mixed<File>()
-    //     .required("Image is required"),
+    //   image: Yup.mixed().nullable().required("Image is required"),
     // });
-    
+
     // const formik = useFormik({
-    //   initialValues: {
-    //     name: "",
-    //     image: null,
-    //   },
-    //   validationSchema,
-    //   onSubmit: handleSubmit,
+    // initialValues: {
+    //   name: "",
+    //   image: null as File | null,
+    // },
+    // validationSchema,
+    // onSubmit: (values) => {
+    //   console.log("SUBMIT WORKS", values);
+    //     if (editingCategory) {
+    //       setCategories((prev) =>
+    //         prev.map((cat) =>
+    //           cat.id === editingCategory.id
+    //             ? {
+    //                 ...cat,
+    //                 name: values.name,
+    //                 slug: values.name.toLowerCase(),
+    //               }
+    //             : cat
+    //         )
+    //       );
+
+    //       setIsEditCategoryModalOpen(false);
+    //     } else {
+    //       const newCategory: Category = {
+    //         id: crypto.randomUUID(),
+    //         name: values.name,
+    //         slug: values.name.toLowerCase(),
+    //         description: "",
+    //         createdAt: new Date().toISOString(),
+    //       };
+
+    //       setCategories((prev) => [...prev, newCategory]);
+    //       setIsAddCategoryModalOpen(false);
+    //     }
+    //   }
     // });
+
     
-    // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //   const file = e.target.files?.[0];
+    // RTK Api Calling
+    const { data, isLoading, refetch, isError , isFetching} = useGetCategoriesQuery();
+    
+    const categories = data?.data ?? [];
 
-    //   if (!file) return;
+    const [ createCategory ] = useCreateCategoryMutation(); 
+    const [ updateCategory ] = useUpdateCategoryMutation();
+    const [ deleteCategory ] = useDeleteCategoryMutation();
 
-    //   setPreviewImage(URL.createObjectURL(file));
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-    //   formik.setFieldValue("image", file);
-    // };
+    const [previewImage, setPreviewImage] = useState("");
+    
+    const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
+    const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
 
-    // function handleAddCategory() {
-    //   formik.resetForm();
-    //   setPreviewImage("");
-    //   setIsAddCategoryModalOpen(true);
-    // }
+    
+    // Adding Category
+    const addValidationSchema = Yup.object({
+      name: Yup.string()
+        .required("Name is required")
+        .min(3, "Name must be at least 3 characters"),
 
+      image: Yup.mixed<File>()
+        .required("Image is required"),
+    });
+    
+    const formik = useFormik({
+      initialValues: {
+        name: "",
+        image: null,
+      },
+      validationSchema: addValidationSchema,
+      onSubmit: handleSubmit,
+    });
+    
+    async function handleSubmit(values: any){
+      try {
+        const formData = new FormData();
+
+        formData.append("name", values.name);
+        formData.append("image", values.image);
+        
+        await createCategory({ data: formData }).unwrap();
+        refetch();
+
+        setIsAddCategoryModalOpen(false);
+        setPreviewImage("");
+        formik.resetForm();
+
+        toast.success("Category Added Successfully");
+
+      } catch (err: any) {
+          const message = err?.data?.message || err?.error?.data?.message || err?.error?.message || err?.message || "Something went wrong";
+          toast.error(message);
+        }
+    };
+
+    function handleAddCategory() {
+      formik.resetForm();
+      setPreviewImage("");
+      setIsAddCategoryModalOpen(true);
+    }
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+
+      if (!file) return;
+
+      setPreviewImage(URL.createObjectURL(file));
+
+      formik.setFieldValue("image", file);
+    };
+    
+
+    // Updating Category
+    const updateValidationSchema = Yup.object({
+      name: Yup.string()
+        .required("Name is required")
+        .min(3, "Name must be at least 3 characters"),
+
+      image: Yup.mixed<File>().nullable(),
+    });
+
+    const updateFormik = useFormik<UpdateCategoryFormValues>({
+      enableReinitialize: true,
+      initialValues: {
+        name: editingCategory?.name || "",
+        image: null as File | null,
+      },
+      validationSchema: updateValidationSchema,
+      onSubmit: handleUpdateSubmit
+    });
+
+    async function handleUpdateSubmit(values: UpdateCategoryFormValues) {
+      if (!editingCategory){
+          return;
+        }
+        try {
+          const formData = new FormData();
+
+          formData.append("name", values.name);
+
+          if (values.image) {
+            formData.append("image", values.image);
+          }
+
+          await updateCategory({ id: editingCategory.id, data: formData }).unwrap();
+          refetch();
+
+          setIsEditCategoryModalOpen(false);
+          setEditingCategory(null);
+          setPreviewImage("");
+
+          toast.success("Category Updated Successfully");
+
+        } catch (err: any) {
+            const message = err?.data?.message || err?.error?.data?.message || err?.error?.message || err?.message || "Something went wrong";
+            toast.error(message);
+        }
+    }
+
+    function handleUpdateCategory(category: Category) {
+      setIsEditCategoryModalOpen(true);
+      setEditingCategory(category)
+    }
+
+    const handleUpdateImageUpload = (
+      e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+      const file = e.target.files?.[0];
+
+      if (!file) return;
+
+      setPreviewImage(URL.createObjectURL(file));
+
+      updateFormik.setFieldValue("image", file);
+    };
+
+
+    // Deleting Category
+    async function handleDelete(id: string) {
+      try {
+        await deleteCategory({ id }).unwrap();
+        refetch();
+        toast.success("Category Deleted Successfully");
+
+      } catch (error) {
+        toast.error("Delete failed");
+      }
+    }
+
+
+  if (isLoading || isFetching) {
+    return <AdminCategoriesPageSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center p-6">
+        <div className="w-full max-w-md rounded-3xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+
+          {/* Icon */}
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-[#DB4444]">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-8 w-8"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+              />
+            </svg>
+          </div>
+
+          {/* Title */}
+          <h2 className="text-xl font-bold text-black">
+            Failed to load categories
+          </h2>
+
+          {/* Subtitle */}
+          <p className="mt-2 text-sm text-gray-500">
+            Something went wrong while fetching data. Please try again.
+          </p>
+
+          {/* Button */}
+          <button
+            onClick={refetch}
+            className="mt-6 w-full rounded-2xl bg-[#DB4444] px-5 py-3 text-sm font-semibold text-white shadow transition hover:bg-white hover:text-[#DB4444] hover:border hover:border-[#DB4444]"
+          >
+            Retry
+          </button>
+
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -406,7 +525,7 @@ export default function CategoriesPage() {
                         <div className="flex items-center gap-3">
 
                         <button
-                            onClick={()=> {handleEditCategory(category)}}
+                            onClick={ ()=> { handleUpdateCategory(category) } }
                             className="
                             flex h-10 w-10 items-center justify-center
                             rounded-xl border border-gray-200
@@ -418,6 +537,7 @@ export default function CategoriesPage() {
                         </button>
 
                         <button
+                            onClick={()=> {handleDelete(category.id)}}
                             className="
                             flex h-10 w-10 items-center justify-center
                             rounded-xl border border-gray-200
@@ -498,7 +618,7 @@ export default function CategoriesPage() {
                     <div className="flex items-center gap-3 pt-2">
                     <button
                         type="button"
-                        onClick={()=> {handleEditCategory(category)}}
+                        onClick={ ()=> { handleUpdateCategory(category) } }
                         className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:border-[#DB4444] hover:text-[#DB4444]"
                     >
                         <FontAwesomeIcon icon={faPenToSquare} />
@@ -527,7 +647,7 @@ export default function CategoriesPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-xl">
 
-              <form onSubmit={formik.handleSubmit}>
+              <form onSubmit={updateFormik.handleSubmit}>
               
                 <div className="mb-6 flex items-center justify-between">
                   <h2 className="text-2xl font-bold">
@@ -553,13 +673,36 @@ export default function CategoriesPage() {
 
                     <input
                       type="text"
-                      value={formik.values.name}
+                      value={updateFormik.values.name}
                       name="name"
                       id="name"
-                      onChange={formik.handleChange}
+                      onChange={updateFormik.handleChange}
                       className="w-full rounded-2xl border border-gray-200 bg-gray-100 px-4 py-3 text-gray-500"
                     />
                   </div>
+
+                  <div>
+                      <label className="mb-2 block text-sm font-medium">
+                        Image
+                      </label>
+
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleUpdateImageUpload}
+                        className="w-full rounded-2xl border border-gray-200 px-4 py-3"
+                      />
+
+                      {
+                        (previewImage || editingCategory?.image) && (
+                          <img
+                            src={previewImage || getImageUrl(editingCategory?.image)}
+                            className="mt-3 h-32 w-32 rounded-xl object-contain"
+                          />
+                        )
+                      }
+
+                    </div>
 
                 </div>
 
