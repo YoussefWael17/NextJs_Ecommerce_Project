@@ -59,11 +59,11 @@ export default function VendorLayout({
           label: "My Products",
           icon: faBoxOpen,
         },
-        {
-          href: "/vendor/products/create",
-          label: "Add Product",
-          icon: faPlus,
-        },
+        // {
+        //   href: "/vendor/products/create",
+        //   label: "Add Product",
+        //   icon: faPlus,
+        // },
       ],
     },
 
@@ -121,7 +121,7 @@ export default function VendorLayout({
   };
 
   return (
-    <ProtectedRoute roles={["CUSTOMER"]}>
+    <ProtectedRoute roles={["ADMIN"]}>
       <div className="min-h-screen bg-white">
         {/* Navbar */}
         <header className="sticky top-0 z-50 border-b border-gray-300 bg-white">
