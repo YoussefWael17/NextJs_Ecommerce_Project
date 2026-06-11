@@ -1,4 +1,5 @@
 import { Product } from "@/app/types/product";
+import { Variant } from "@/app/types/variant";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const vendorsApi = createApi({
@@ -51,6 +52,33 @@ export const vendorsApi = createApi({
             invalidatesTags: ["Vendors"],
         }),
 
+        deleteProduct: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `products/${id}`,
+                method: "DELETE",
+            }),
+
+            invalidatesTags: ["Vendors"],
+        }),
+
+        addProductVariant: builder.mutation<Variant, { id: string; data: any }>({
+            query: ({ id, data }) => ({
+                url: `products/${id}/variants`,
+                method: "POST",
+                body: data,
+        }),
+            invalidatesTags: ["Vendors"],
+        }),
+
+        deleteProductVariant: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `variants/${id}`,
+                method: "DELETE",
+            }),
+
+            invalidatesTags: ["Vendors"],
+        }),
+
         
 
     }),
@@ -60,5 +88,8 @@ export const {
     useGetProductsQuery,
     useGetSingleProductQuery,
     useAddProductMutation,
+    useAddProductVariantMutation,
+    useDeleteProductVariantMutation,
+    useDeleteProductMutation,
     
 } = vendorsApi;

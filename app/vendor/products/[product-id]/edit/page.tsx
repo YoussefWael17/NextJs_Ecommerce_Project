@@ -1,13 +1,16 @@
 "use client"
 
 import { getImageUrl } from '@/app/admin/utils/getImageUrl';
-import { useGetSingleProductQuery } from '@/app/redux/services/vendorsApi';
-import { faImage } from '@fortawesome/free-regular-svg-icons';
+import { useAddProductVariantMutation, useDeleteProductVariantMutation, useGetSingleProductQuery } from '@/app/redux/services/vendorsApi';
+import { Color, Size } from '@/app/types/variant';
+import { faImage, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
+import { faPlus, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { useFormik } from 'formik';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+
 import { toast } from 'sonner';
 import * as Yup from "yup";
 
@@ -21,9 +24,17 @@ export default function page() {
         skip: !id,
     });
 
+    const [addProductVaraint] = useAddProductVariantMutation()
+    const [deleteVariant] = useDeleteProductVariantMutation()
+
 
     const [previewImage, setPreviewImage] = useState("");
     const [categoriesApi, setCategoriesApi] = useState([]);
+    const [sizesApi, setSizesApi] = useState([]);
+    const [colorsApi, setColorsApi] = useState([]);
+    
+
+    const [showVariantForm, setShowVariantForm] = useState(false);
 
     async function getCategories() {
         try {
@@ -31,11 +42,53 @@ export default function page() {
             if(response.data.success === true){
             setCategoriesApi(response?.data?.data)
             }
-            console.log(response.data);
+            // console.log(response.data);
         } catch (error) {
             console.log(error)
         }
     }
+
+    async function getSizes() {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/vendor/sizes`,{
+                headers:{
+                    Authorization: `Bearer ${localStorage.getItem("userToken")}`
+                }
+            });
+            if(response.data.success === true){
+                setSizesApi(response?.data?.data)
+            }
+            // console.log(response.data);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function getColors() {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/vendor/colors`,{
+                headers:{
+                    Authorization: `Bearer ${localStorage.getItem("userToken")}`
+                }
+            });
+            if(response.data.success === true){
+                setColorsApi(response?.data?.data)
+            }
+            // console.log(response.data);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleDeleteVariant = async (variantId: string) => {
+        try {
+            await deleteVariant(variantId).unwrap();
+            toast.success("Variant deleted successfully");
+            refetch()
+        } catch (error) {
+            toast.error("Failed to delete variant");
+        }
+    };
 
     const updateProductValidationSchema = Yup.object({
         title: Yup.string()
@@ -92,10 +145,11 @@ export default function page() {
         validationSchema: updateProductValidationSchema,
         onSubmit: handleSubmit,
     });
-        
-    
+            
     useEffect(() => {
         getCategories();
+        getSizes();
+        getColors()
 
         if (!product?.data) return;
 
@@ -108,10 +162,64 @@ export default function page() {
             isActive: product.data.isActive || false,
         });
 
+        console.log(product.data.variants)
+
         setPreviewImage(product.data.thumbnail || "");
     }, [product?.data]);
 
 
+    const variantProductValidationSchema = Yup.object({
+        sizeId: Yup.string()
+            .required("Size is required"),
+
+        colorId: Yup.string()
+            .required("Color is required"),
+
+        stock: Yup.number()
+            .typeError("Stock must be a number")
+            .min(0, "Stock cannot be negative")
+            .required("Stock is required"),
+
+        price: Yup.number()
+            .typeError("Price must be a number")
+            .min(0, "Price cannot be negative")
+            .required("Price is required"),
+    });
+
+    const handleVariantSubmit = async (values: any) => {
+        try {
+            if (!id) return;
+
+            await addProductVaraint({
+                id: id as string,
+                data: {
+                    sizeId: values.sizeId,
+                    colorId: values.colorId,
+                    stock: values.stock,
+                    price: values.price,
+                },
+            }).unwrap();
+
+            toast.success("Variant Saved Successfully");
+            variantFormik.resetForm();
+            setShowVariantForm(false)
+
+        } catch (err) {
+            console.log(err);
+            toast.error("Something went wrong");
+        }
+    };
+
+    const variantFormik = useFormik({
+        initialValues: {
+            sizeId: "",
+            colorId: "",
+            stock: 0,
+            price: 0,
+        },
+        validationSchema: variantProductValidationSchema,
+        onSubmit: handleVariantSubmit,
+    });
     
     
     if (isLoading || isFetching) {
@@ -172,18 +280,19 @@ export default function page() {
     return (
         <div className="space-y-6 lg:space-y-8">
 
-                <form onSubmit={formik.handleSubmit}>
+            <form onSubmit={formik.handleSubmit}>
 
                 {/* Header */}
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold">
-                    Edit Product
+                        Edit Product
                     </h1>
 
                     <p className="mt-2 text-sm text-gray-500">
-                    Edit Product And Manage Inventory.
+                        Edit Product And Manage Inventory.
                     </p>
                 </div>
+
 
                 {/* Fields */}
                 <div className="grid gap-4 md:grid-cols-2">
@@ -210,7 +319,6 @@ export default function page() {
                         </p>
                         )}
                     </div>
-
 
                     {/* Category */}
                     <div className="relative">
@@ -252,7 +360,6 @@ export default function page() {
                         </svg>
                         </div>
                     </div>
-
 
                     {/* Description */}
                     <div>
@@ -368,7 +475,262 @@ export default function page() {
                         </label>
                     </div>
 
+
+                    {/* Available Variants */}
+                    { product?.data?.variants?.length ? (
+                        product?.data?.variants?.map((variant, index) => (
+                            <div
+                                key={variant.id || index}
+                                className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+                            >
+        
+                                <div className="mb-5 flex items-center justify-between">
+                                    <h2 className="text-lg font-semibold text-gray-800">
+                                        Variant {index + 1}
+                                    </h2>
+
+                                    <div className="flex items-center gap-2">
+
+                                        <button
+                                            type="button"
+                                            // onClick={() => handleEditVariant(variant)}
+                                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition hover:bg-blue-100"
+                                        >
+                                            <FontAwesomeIcon icon={faPenToSquare} />
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDeleteVariant(variant.id)}
+                                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100"
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </button>
+
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    
+                                    <div>
+                                        <label className="mb-2 block text-sm font-medium text-gray-700">
+                                            Sizes
+                                        </label>
+                                        <h2>{variant.size?.name}</h2>
+                                    </div>
+
+                                    <div>
+                                        <label className="mb-2 block text-sm font-medium text-gray-700">
+                                            Color
+                                        </label>
+                                        <h2>{variant.color?.name}</h2>
+                                    </div>
+
+                                    <div>
+                                        <label className="mb-2 block text-sm font-medium text-gray-700">
+                                            Stock
+                                        </label>
+                                        <h2 className="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+                                            {variant.stock}
+                                        </h2>
+                                    </div>
+
+                                    <div>
+                                        <label className="mb-2 block text-sm font-medium text-gray-700">
+                                            Price
+                                        </label>
+                                        <h2 className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
+                                            ${variant.price}
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )  :  null}
+
+
+                    {/* Variant Form For Adding */}
+                    { showVariantForm && (
+                        <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                            
+                            <div className="mb-5 flex items-center justify-between">
+                                <h2 className="text-lg font-semibold text-gray-800">
+                                    Add New Variant
+                                </h2>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setShowVariantForm(false)}
+                                    className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-red-500"
+                                    >
+                                    <FontAwesomeIcon icon={faXmark} />
+                                </button>
+                            </div>
+
+                            <div className="grid gap-4 md:grid-cols-2">
+
+                        
+                            <div className="relative">
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Sizes
+                                </label>
+
+                                <select
+                                    name="sizeId"
+                                    value={variantFormik.values.sizeId}
+                                    onChange={variantFormik.handleChange}
+                                    onBlur={variantFormik.handleBlur}
+                                    className="w-full appearance-none rounded-2xl border border-gray-200 px-4 py-3 pr-10 outline-none focus:border-[#DB4444]"
+                                >
+                                    <option value="">Select Size</option>
+
+                                    {sizesApi.map((size: Size) => (
+                                        <option
+                                        key={size.id}
+                                        value={size.id}
+                                        >
+                                        {size.name}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <div className="pointer-events-none absolute inset-y-0 right-4 top-6 flex items-center">
+                                    <svg
+                                        className="h-4 w-4 text-gray-500"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
+                                        <path
+                                        fillRule="evenodd"
+                                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                        clipRule="evenodd"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div className="relative">
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Color
+                                </label>
+
+                                <select
+                                    name="colorId"
+                                    value={variantFormik.values.colorId}
+                                    onChange={variantFormik.handleChange}
+                                    onBlur={variantFormik.handleBlur}
+                                    className="w-full appearance-none rounded-2xl border border-gray-200 px-4 py-3 pr-10 outline-none focus:border-[#DB4444]"
+                                >
+                                    <option value="">Select Color</option>
+
+                                    {colorsApi.map((color: Color) => (
+                                        <option
+                                        key={color.id}
+                                        value={color.id}
+                                        >
+                                        {color.name}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <div className="pointer-events-none absolute inset-y-0 right-4 top-6 flex items-center">
+                                    <svg
+                                        className="h-4 w-4 text-gray-500"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
+                                        <path
+                                        fillRule="evenodd"
+                                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                        clipRule="evenodd"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Stock
+                                </label>
+
+                                <input
+                                name="stock"
+                                value={variantFormik.values.stock}
+                                onChange={variantFormik.handleChange}
+                                onBlur={variantFormik.handleBlur}
+                                type="number"
+                                placeholder="e.g. Large, Red, 128GB"
+                                className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-[#DB4444]"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Price
+                                </label>
+
+                                <input
+                                name="price"
+                                value={variantFormik.values.price}
+                                onChange={variantFormik.handleChange}
+                                onBlur={variantFormik.handleBlur}
+                                type="number"
+                                placeholder="Enter price"
+                                className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-[#DB4444]"
+                                />
+                            </div>
+
+                            </div>
+
+                            <div className="mt-6 flex justify-end gap-3">
+                            
+                            <button
+                                type="button"
+                                onClick={() => setShowVariantForm(false)}
+                                className="rounded-xl border border-gray-300 px-5 py-2.5 text-gray-600 transition hover:bg-gray-100"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => variantFormik.handleSubmit()}
+                                className="rounded-xl bg-[#DB4444] px-5 py-2.5 text-white transition hover:opacity-90"
+                            >
+                                Save Variant
+                            </button>
+
+                            </div>
+
+                        </div>
+                    )}
+
+
+                    {/* Button For Add New Varaint */}
+                    <div
+                        onClick={() => setShowVariantForm(true)}
+                        className="mt-6 cursor-pointer rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-8 transition hover:border-[#DB4444] hover:bg-red-50"
+                        >
+                        <div className="flex flex-col items-center justify-center text-center">
+
+                            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-sm">
+                            <FontAwesomeIcon
+                                icon={faPlus}
+                                className="text-xl text-[#DB4444]"
+                            />
+                            </div>
+
+                            <h3 className="text-lg font-semibold text-gray-800">
+                            Add New Variant
+                            </h3>
+
+                        </div>
+                    </div>
+                                        
                 </div>
+
 
                 {/* Footer */}
                 <div className="mt-8 flex justify-end gap-3">
@@ -383,7 +745,9 @@ export default function page() {
 
                 </div>
 
-                </form>
+            </form>
+
+
 
         </div>
     )

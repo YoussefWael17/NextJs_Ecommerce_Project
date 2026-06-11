@@ -6,9 +6,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { faPlus, faBoxesStacked, faBox, faTag, faMagnifyingGlass, faTrash } from "@fortawesome/free-solid-svg-icons";
 import formatDate from "@/app/admin/utils/formateData";
-import { useGetProductsQuery } from "@/app/redux/services/vendorsApi";
+import { useDeleteProductMutation, useGetProductsQuery } from "@/app/redux/services/vendorsApi";
 import { getImageUrl } from "@/app/admin/utils/getImageUrl";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import VendorProductsPageSkeleton from "@/app/components/skeletonUI/vendor-products-skeleton";
 
 
 
@@ -17,8 +19,10 @@ export default function VendorProductsPage() {
   
   const router = useRouter();
   
-  const { data } = useGetProductsQuery();
+  const { data, refetch, isLoading, isFetching} = useGetProductsQuery();
   const products = data?.data || [];
+
+  const [deleteProduct] = useDeleteProductMutation();
  
   function navigateToAddProduct(){
     return router.push("/vendor/products/create");
@@ -26,6 +30,16 @@ export default function VendorProductsPage() {
 
   function navigateToEditProduct(id: string) {
     return router.push(`/vendor/products/${id}/edit`)
+  }
+
+  async function handleDeleteProduct(id: string) {
+    try {
+      await deleteProduct(id).unwrap()
+      toast.success("Product deleted successfully");
+      refetch()
+    } catch (error) {
+      toast.error("Failed to delete product");
+    }
   }
 
   
@@ -38,6 +52,13 @@ export default function VendorProductsPage() {
   const inStockProducts = 100;
   const outOfStockProducts = 200
   const totalInventory = 1033;
+
+
+  if(isLoading || isFetching){
+    return(
+      <VendorProductsPageSkeleton /> 
+    )
+  }
 
   return (
     
@@ -222,7 +243,9 @@ export default function VendorProductsPage() {
                         <FontAwesomeIcon icon={faPenToSquare} />
                       </button>
 
-                      <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 hover:border-red-500 hover:text-red-500">
+                      <button
+                        onClick={() => {handleDeleteProduct(product.id)}} 
+                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 hover:border-red-500 hover:text-red-500">
                         <FontAwesomeIcon icon={faTrash} />
                       </button>
                     </div>
@@ -306,7 +329,9 @@ export default function VendorProductsPage() {
                   Edit
                 </button>
 
-                <button className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white py-3 text-sm hover:border-red-500 hover:text-red-500">
+                <button
+                  onClick={() => {handleDeleteProduct(product.id)}}  
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white py-3 text-sm hover:border-red-500 hover:text-red-500">
                   <FontAwesomeIcon icon={faTrash} />
                   Delete
                 </button>
