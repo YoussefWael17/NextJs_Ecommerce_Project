@@ -4,24 +4,69 @@ import { faHeart, faEye, faTrashCan } from "@fortawesome/free-regular-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "sonner";
 import React from "react";
+import { Variant } from "../types/variant";
+import { ProductImage } from "../types/product-images";
+import { Vendor } from "../types/vendor";
+import { Category } from "../types/category";
+import { getImageUrl } from "../admin/utils/getImageUrl";
 
 interface Product {
-  id: number;
-  image: string;
-  name: string;
-  category: string;
-  price: number;
-  discount: number;
-  isOffered: boolean;
-  isAdded: boolean
+  id: string;
+
+  title: string;
+  
+  slug?: string;
+  description?: string;
+  thumbnail: string;
+
+  isActive?: boolean;
+  isSale?: boolean;
+
+  category: Category;
+  categoryId?: string;
+
+
+  vendorId?: string;
+  vendor?: Vendor;
+
+  variants?: Variant[];
+  images?: ProductImage[];
+
+  createdAt?: string;
+  updatedAt?: string;
+
+  price?: number;
+  discount?: number;
+  isOffered?: boolean;
+  isAdded?: boolean
+
+
+
+  
+  
+  
+  
+
+  
+
+  
 }
 
 interface ProductCardProps {
   product: Product;
 }
 
+
+
+
+
+
 export default function ProductCard({product}: ProductCardProps) {
   const { isOffered, isAdded } = product;
+
+  const prices = product.variants?.map(v => v.price) ?? [];
+  const maxPrice = prices.length ? Math.max(...prices) : 0;
+
   return (
     <div className="flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_33.333%] lg:flex-[0_0_25%]">
 
@@ -35,8 +80,8 @@ export default function ProductCard({product}: ProductCardProps) {
           <div className="relative flex h-62.5 items-center justify-center bg-[#F5F5F5]">
 
             <img
-              src={product.image}
-              alt={product.name}
+              src={getImageUrl(product.thumbnail)}
+              alt={product.title}
               className="h-37.5 object-contain"
             />
 
@@ -101,17 +146,17 @@ export default function ProductCard({product}: ProductCardProps) {
           <div className="p-4">
 
             <h3 className="text-lg font-bold">
-              {product.name}
+              {product.title}
             </h3>
 
             <p className="text-sm text-gray-500">
-              {product.category}
+              {product.category.name}
             </p>
 
             <div className="mt-2 flex items-center gap-2">
 
               <span className="font-bold text-red-500">
-                ${product.price}
+                ${maxPrice}
               </span>
 
 

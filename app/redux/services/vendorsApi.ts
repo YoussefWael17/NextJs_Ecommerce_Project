@@ -1,5 +1,6 @@
 import { Product } from "@/app/types/product";
-import { Variant } from "@/app/types/variant";
+import { ProductsResponse } from "@/app/types/products-response";
+import { UpdateVariantPayload, Variant } from "@/app/types/variant";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const vendorsApi = createApi({
@@ -23,7 +24,7 @@ export const vendorsApi = createApi({
 
         headers.set(
             "authorization",
-            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiZjQzZmUwNS1mODI0LTRjYzItOTA5Ni1hZDBjMDUzMDY5OTUiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzgxMDk0MzY2LCJleHAiOjE3ODE2OTkxNjZ9.-YDRcOpKFBP1UcHeic1v3hmmRXD5rfwCVSEQRmZljr4`
+            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODExODY2ODcsImV4cCI6MTc4MTc5MTQ4N30.vLCc_iSvsxc7k0rg4bm7INpXIsYVypQSBheQOq_h2lU`
         );
 
         return headers;
@@ -33,8 +34,8 @@ export const vendorsApi = createApi({
     tagTypes: ["Vendors"],
   
     endpoints: (builder) => ({
-        getProducts: builder.query<{ success: Boolean, data:Product[]}, void>({
-            query: () => "products",
+        getProducts: builder.query <ProductsResponse ,{ page?: number, limit?: number}> ({
+            query: ({ page, limit }) => `products?page=${page}&limit=${limit}`,
             providesTags: ["Vendors"],
         }),
 
@@ -70,6 +71,16 @@ export const vendorsApi = createApi({
             invalidatesTags: ["Vendors"],
         }),
 
+        updateProductVariant: builder.mutation<Variant, UpdateVariantPayload>({
+            query: ({ id, data }) => ({
+                url: `variants/${id}`,
+                method: "PATCH",
+                body: data,
+            }),
+
+            invalidatesTags: ["Vendors"],
+        }),
+
         deleteProductVariant: builder.mutation<void, string>({
             query: (id) => ({
                 url: `variants/${id}`,
@@ -90,6 +101,7 @@ export const {
     useAddProductMutation,
     useAddProductVariantMutation,
     useDeleteProductVariantMutation,
+    useUpdateProductVariantMutation,
     useDeleteProductMutation,
     
 } = vendorsApi;

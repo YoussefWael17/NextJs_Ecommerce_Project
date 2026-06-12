@@ -11,16 +11,26 @@ import { getImageUrl } from "@/app/admin/utils/getImageUrl";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import VendorProductsPageSkeleton from "@/app/components/skeletonUI/vendor-products-skeleton";
+import { useEffect, useState } from "react";
 
 
 
 
 export default function VendorProductsPage() {
+
+  function getInitialPage() {
+    if (typeof window === "undefined") return 1;
+
+    const saved = localStorage.getItem("products_page");
+    return saved ? Number(saved) : 1;
+  };
   
   const router = useRouter();
   
-  const { data, refetch, isLoading, isFetching} = useGetProductsQuery();
-  const products = data?.data || [];
+  const [page, setPage] = useState(getInitialPage);
+  const { data, refetch, isLoading, isFetching} = useGetProductsQuery({page, limit:5});
+  const products = data?.data?.products ?? [];
+  const pagination = data?.data?.pagination;
 
   const [deleteProduct] = useDeleteProductMutation();
  
@@ -42,13 +52,27 @@ export default function VendorProductsPage() {
     }
   }
 
-  
-  
 
+  useEffect(() => {
+    localStorage.setItem("products_page", String(page));
+  }, [page]);
   
+  
+  const totalProducts = pagination?.total ?? 0;
+  
+  const totalPages = pagination?.totalPages || 1;
 
-  const totalProducts = products.length;
-  
+  const visiblePages = Array.from(
+    { length: totalPages },
+    (_, i) => i + 1
+  ).filter(
+    (p) =>
+      p === 1 ||
+      p === totalPages ||
+      Math.abs(p - page) <= 1
+  );
+
+
   const inStockProducts = 100;
   const outOfStockProducts = 200
   const totalInventory = 1033;
@@ -256,6 +280,8 @@ export default function VendorProductsPage() {
           </table>
         </div>
 
+        
+
         {/* Mobile */}
         <div className="space-y-5 lg:hidden">
           {products.map((product) => (
@@ -339,6 +365,66 @@ export default function VendorProductsPage() {
             </div>
           ))}
         </div>
+
+        <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
+  
+          <p className="text-sm text-gray-500">
+            Showing page {pagination?.page} of {pagination?.totalPages}
+          </p>
+
+          <div className="flex items-center gap-2">
+
+            <button
+              onClick={() => setPage((prev) => prev - 1)}
+              disabled={page === 1}
+              className="rounded-xl border border-gray-200 px-4 py-2 text-sm transition hover:border-[#DB4444] hover:text-[#DB4444] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Previous
+            </button>
+
+            {/* {Array.from(
+              { length: pagination?.totalPages || 0 },
+              (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setPage(index + 1)}
+                  className={`h-10 w-10 rounded-xl text-sm font-medium transition ${
+                    page === index + 1
+                      ? "bg-[#DB4444] text-white"
+                      : "border border-gray-200 hover:border-[#DB4444] hover:text-[#DB4444]"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              )
+            )} */}
+
+            {visiblePages.map((pageNumber) => (
+              <button
+                key={pageNumber}
+                onClick={() => setPage(pageNumber)}
+                className={`h-10 w-10 rounded-xl text-sm font-medium transition ${
+                  page === pageNumber
+                    ? "bg-[#DB4444] text-white"
+                    : "border border-gray-200 hover:border-[#DB4444] hover:text-[#DB4444]"
+                }`}
+              >
+                {pageNumber}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setPage((prev) => prev + 1)}
+              disabled={page === pagination?.totalPages}
+              className="rounded-xl border border-gray-200 px-4 py-2 text-sm transition hover:border-[#DB4444] hover:text-[#DB4444] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
+
+          </div>
+        </div>
+
+        
       </div>
 
       

@@ -27,3 +27,21 @@ export interface Variant {
   color?: Color;
 }
 
+
+export interface UpdateVariantPayload {
+    id: string;
+    data: {
+        stock?: number;
+        price?: number;
+        size?: string;
+        color?: string;
+    };
+}
+
+
+export interface EditedVariant {
+    sizeId: string;
+    colorId: string;
+    stock: number | string;
+    price: number | string;
+}

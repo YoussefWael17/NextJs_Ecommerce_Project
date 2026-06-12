@@ -1,8 +1,8 @@
 "use client"
 
 import { getImageUrl } from '@/app/admin/utils/getImageUrl';
-import { useAddProductVariantMutation, useDeleteProductVariantMutation, useGetSingleProductQuery } from '@/app/redux/services/vendorsApi';
-import { Color, Size } from '@/app/types/variant';
+import { useAddProductVariantMutation, useDeleteProductVariantMutation, useGetSingleProductQuery, useUpdateProductVariantMutation } from '@/app/redux/services/vendorsApi';
+import { Color, EditedVariant, Size, Variant } from '@/app/types/variant';
 import { faImage, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 import { faPlus, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,6 +13,15 @@ import React, { useEffect, useState } from 'react'
 
 import { toast } from 'sonner';
 import * as Yup from "yup";
+
+const initialVariantState = {
+    sizeId: "",
+    colorId: "",
+    stock: 0,
+    price: 0,
+};
+
+
 
 export default function page() {
 
@@ -26,6 +35,7 @@ export default function page() {
 
     const [addProductVaraint] = useAddProductVariantMutation()
     const [deleteVariant] = useDeleteProductVariantMutation()
+    const [updateVariant] = useUpdateProductVariantMutation()
 
 
     const [previewImage, setPreviewImage] = useState("");
@@ -35,6 +45,47 @@ export default function page() {
     
 
     const [showVariantForm, setShowVariantForm] = useState(false);
+
+
+    const [editingVariantId, setEditingVariantId] = useState<string>("");
+    const [editedVariant, setEditedVariant] = useState(initialVariantState);
+
+    const handleEditVariant = (variant: any) => {
+        setEditingVariantId(variant.id);
+        setEditedVariant({
+            sizeId: variant.size?.id || "",
+            colorId: variant.color?.id || "",
+            stock: variant.stock || "",
+            price: variant.price || "",
+        });
+    };
+
+    const handleChange = (e: any) => {
+        const { name, value } = e.target;
+
+        setEditedVariant((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSaveVariant = async (variantId: string) => {
+        try {
+            await updateVariant({
+                id: variantId,
+                data: editedVariant,
+            }).unwrap();
+
+            console.log(editedVariant);
+
+            setEditingVariantId("");
+            setEditedVariant(initialVariantState);
+
+            refetch()
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     async function getCategories() {
         try {
@@ -491,58 +542,185 @@ export default function page() {
 
                                     <div className="flex items-center gap-2">
 
-                                        <button
-                                            type="button"
-                                            // onClick={() => handleEditVariant(variant)}
-                                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition hover:bg-blue-100"
-                                        >
-                                            <FontAwesomeIcon icon={faPenToSquare} />
-                                        </button>
+                                        {editingVariantId !== variant.id ? (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleEditVariant(variant)}
+                                                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition hover:bg-blue-100"
+                                                >
+                                                    <FontAwesomeIcon icon={faPenToSquare} />
+                                                </button>
 
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDeleteVariant(variant.id)}
-                                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100"
-                                        >
-                                            <FontAwesomeIcon icon={faTrash} />
-                                        </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDeleteVariant(variant.id)}
+                                                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100"
+                                                >
+                                                    <FontAwesomeIcon icon={faTrash} />
+                                                </button>
+                                            </>
+                                        ): (null)}
 
                                     </div>
                                 </div>
 
                                 <div className="grid gap-4 md:grid-cols-2">
-                                    
+
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-gray-700">
-                                            Sizes
+                                             Size
                                         </label>
-                                        <h2>{variant.size?.name}</h2>
+                                        {editingVariantId === variant.id ? (
+                                            <div className="relative">
+                                                
+                                                <select
+                                                    name="sizeId"
+                                                    value={editedVariant.sizeId}
+                                                    onChange={handleChange}
+                                                    className="w-full appearance-none rounded-lg border border-gray-300 p-2"
+                                                >
+                                                    <option value="">Select Size</option>
+
+                                                    {sizesApi.map((size: Size) => (
+                                                        <option
+                                                            key={size.id}
+                                                            value={size.id}
+                                                        >
+                                                            {size.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+
+                                                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+                                                    <svg
+                                                        className="h-4 w-4 text-gray-500"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <h2>{variant.size?.name}</h2>
+                                        )}
                                     </div>
+                                    
 
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-gray-700">
                                             Color
                                         </label>
-                                        <h2>{variant.color?.name}</h2>
+                                        {editingVariantId === variant.id ? (
+                                            <div className="relative">
+                                                
+                                                <select
+                                                    name="colorId"
+                                                    value={editedVariant.colorId}
+                                                    onChange={handleChange}
+                                                    className="w-full appearance-none rounded-lg border border-gray-300 p-2"
+                                                >
+                                                    <option value="">Select Color</option>
+
+                                                    {colorsApi.map((color: Color) => (
+                                                        <option
+                                                            key={color.id}
+                                                            value={color.id}
+                                                        >
+                                                            {color.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+
+                                                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+                                                    <svg
+                                                        className="h-4 w-4 text-gray-500"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <h2>{variant.color?.name}</h2>
+                                        )}
                                     </div>
 
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-gray-700">
                                             Stock
                                         </label>
-                                        <h2 className="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-                                            {variant.stock}
-                                        </h2>
+
+                                        {editingVariantId === variant.id ? (
+                                            <input
+                                                type="number"
+                                                name="stock"
+                                                value={editedVariant.stock}
+                                                onChange={handleChange}
+                                                className="w-full rounded-lg border p-2"
+                                            />
+                                        ) : (
+                                            <h2 className="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+                                                {variant.stock}
+                                            </h2>
+                                        )}
                                     </div>
 
                                     <div>
                                         <label className="mb-2 block text-sm font-medium text-gray-700">
                                             Price
                                         </label>
-                                        <h2 className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
-                                            ${variant.price}
-                                        </h2>
+
+                                        {editingVariantId === variant.id ? (
+                                            <input
+                                                type="number"
+                                                name="price"
+                                                value={editedVariant.price}
+                                                onChange={handleChange}
+                                                className="w-full rounded-lg border p-2"
+                                            />
+                                        ) : (
+                                            <h2 className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
+                                                ${variant.price}
+                                            </h2>
+                                        )}
                                     </div>
+
+                                    {editingVariantId === variant.id && (
+                                    <div className="mt-4 flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleSaveVariant(variant.id)}
+                                            className="rounded-xl bg-[#DB4444] px-5 py-2.5 text-white transition hover:opacity-90"
+                                        >
+                                            Save
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setEditingVariantId("");
+                                                setEditedVariant(initialVariantState);
+                                            }}
+                                            className="rounded-xl border border-gray-300 px-5 py-2.5 text-gray-600 transition hover:bg-gray-100"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                    )}
+
                                 </div>
                             </div>
                         ))

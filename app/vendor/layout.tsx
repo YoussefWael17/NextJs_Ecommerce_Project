@@ -121,7 +121,7 @@ export default function VendorLayout({
   };
 
   return (
-    <ProtectedRoute roles={["ADMIN"]}>
+    <ProtectedRoute roles={["VENDOR"]}>
       <div className="min-h-screen bg-white">
         {/* Navbar */}
         <header className="sticky top-0 z-50 border-b border-gray-300 bg-white">

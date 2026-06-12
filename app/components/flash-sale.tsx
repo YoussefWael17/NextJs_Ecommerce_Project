@@ -41,71 +41,150 @@ export default function FlashSale() {
 
   const products = [
     {
-      id: 1,
-      image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      name: "PS5 Controller",
-      category: "Gaming",
+      id: "1",
+      thumbnail: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+      title: "PS5 Controller",
+      category: {
+        name: "Gaming",
+        id: "15523",
+      },
       price: 120,
       discount: 240,
       isOffered: true,
       isAdded: false
     },
     {
-      id: 2,
-      image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      name: "PS5 Controller",
-      category: "Gaming",
+      id: "2",
+      thumbnail: "https://www.pngmart.com/files/22/iPhone-14-PNG-Image.png",
+      title: "Iphone 14 Pro Max",
+      category: {
+        name: "Phones",
+        id: "123",
+      },
       price: 120,
       discount: 240,
-      isOffered: true,
+      isOffered: false,
       isAdded: false
     },
     {
-      id: 3,
-      image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      name: "PS5 Controller",
-      category: "Gaming",
+      id: "3",
+      thumbnail: "https://www.pngmart.com/files/23/Apple-Watch-PNG-Pic.png",
+      title: "Apple Watch",
+      category: {
+        name: "Watches",
+        id: "1223",
+      },
       price: 120,
       discount: 240,
-      isOffered: true,
+      isOffered: false,
       isAdded: false
     },
     {
-      id: 4,
-      image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      name: "PS5 Controller",
-      category: "Gaming",
+      id: "4",
+      thumbnail: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+      title: "PS5 Controller",
+      category: {
+        name: "Gaming",
+        id: "10023",
+      },
       price: 120,
       discount: 240,
-      isOffered: true,
+      isOffered: false,
       isAdded: false
     },
     {
-      id: 5,
-      image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      name: "PS5 Controller",
-      category: "Gaming",
+      id: "5",
+      thumbnail: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+      title: "PS5 Controller",
+      category: {
+        name: "Gaming",
+        id: "12355",
+      },
       price: 120,
       discount: 240,
-      isOffered: true,
+      isOffered: false,
       isAdded: false
     },
     {
-      id: 6,
-      image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      name: "PS5 Controller",
-      category: "Gaming",
+      id: "6",
+      thumbnail: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+      title: "PS5 Controller",
+      category: {
+        name: "Gaming",
+        id: "123",
+      },
       price: 120,
       discount: 240,
-      isOffered: true,
+      isOffered: false,
       isAdded: false
     },
+
+    // {
+    //   id: 1,
+    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+    //   name: "PS5 Controller",
+    //   category: "Gaming",
+    //   price: 120,
+    //   discount: 240,
+    //   isOffered: true,
+    //   isAdded: false
+    // },
+    // {
+    //   id: 2,
+    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+    //   name: "PS5 Controller",
+    //   category: "Gaming",
+    //   price: 120,
+    //   discount: 240,
+    //   isOffered: true,
+    //   isAdded: false
+    // },
+    // {
+    //   id: 3,
+    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+    //   name: "PS5 Controller",
+    //   category: "Gaming",
+    //   price: 120,
+    //   discount: 240,
+    //   isOffered: true,
+    //   isAdded: false
+    // },
+    // {
+    //   id: 4,
+    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+    //   name: "PS5 Controller",
+    //   category: "Gaming",
+    //   price: 120,
+    //   discount: 240,
+    //   isOffered: true,
+    //   isAdded: false
+    // },
+    // {
+    //   id: 5,
+    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+    //   name: "PS5 Controller",
+    //   category: "Gaming",
+    //   price: 120,
+    //   discount: 240,
+    //   isOffered: true,
+    //   isAdded: false
+    // },
+    // {
+    //   id: 6,
+    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
+    //   name: "PS5 Controller",
+    //   category: "Gaming",
+    //   price: 120,
+    //   discount: 240,
+    //   isOffered: true,
+    //   isAdded: false
+    // },
   ];
 
   return (
     <div className="flex min-h-screen w-full items-center mb-10">
 
-      <div className="mx-auto w-full max-w-screen-xl px-4">
+      <div className="mx-auto w-full max-w-7xl px-4">
         
         <div className="flex w-full flex-row items-end justify-between px-4 mb-10">
           <div className="flex flex-col">
@@ -190,9 +269,9 @@ export default function FlashSale() {
 
         </div>
 
-        <button className="mx-auto rounded bg-[#DB4444] px-12 py-4 shadow w-[234px] h-[56px] flex justify-center items-center cursor-pointer text-white my-15">View All Products</button>
+        <button className="mx-auto rounded bg-[#DB4444] px-12 py-4 shadow w-58.5 h-14 flex justify-center items-center cursor-pointer text-white my-15">View All Products</button>
 
-        <hr className="hidden md:block border-0 h-0.25 bg-gray-200" />
+        <hr className="hidden md:block border-0 h-px bg-gray-200" />
 
 
       </div>
