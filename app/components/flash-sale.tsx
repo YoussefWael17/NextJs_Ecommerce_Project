@@ -9,6 +9,11 @@ import ProductCard from "./product-card";
 
 export default function FlashSale() {
 
+  const [days, setDays] = useState("0");
+  const [hours, setHours] = useState("0");
+  const [minutes, setMinutes] = useState("0");
+  const [seconds, setSeconds] = useState("0");
+
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
@@ -51,7 +56,9 @@ export default function FlashSale() {
       price: 120,
       discount: 240,
       isOffered: true,
-      isAdded: false
+      isAdded: false,
+      totalReviews: 200,
+      avgRating: 4.5
     },
     {
       id: "2",
@@ -64,7 +71,9 @@ export default function FlashSale() {
       price: 120,
       discount: 240,
       isOffered: false,
-      isAdded: false
+      isAdded: false,
+      totalReviews: 200,
+      avgRating: 4.5
     },
     {
       id: "3",
@@ -77,7 +86,9 @@ export default function FlashSale() {
       price: 120,
       discount: 240,
       isOffered: false,
-      isAdded: false
+      isAdded: false,
+      totalReviews: 200,
+      avgRating: 4.5
     },
     {
       id: "4",
@@ -90,7 +101,9 @@ export default function FlashSale() {
       price: 120,
       discount: 240,
       isOffered: false,
-      isAdded: false
+      isAdded: false,
+      totalReviews: 200,
+      avgRating: 4.5
     },
     {
       id: "5",
@@ -103,7 +116,9 @@ export default function FlashSale() {
       price: 120,
       discount: 240,
       isOffered: false,
-      isAdded: false
+      isAdded: false,
+      totalReviews: 200,
+      avgRating: 4.5
     },
     {
       id: "6",
@@ -116,70 +131,67 @@ export default function FlashSale() {
       price: 120,
       discount: 240,
       isOffered: false,
-      isAdded: false
+      isAdded: false,
+      totalReviews: 200,
+      avgRating: 2.5
     },
-
-    // {
-    //   id: 1,
-    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-    //   name: "PS5 Controller",
-    //   category: "Gaming",
-    //   price: 120,
-    //   discount: 240,
-    //   isOffered: true,
-    //   isAdded: false
-    // },
-    // {
-    //   id: 2,
-    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-    //   name: "PS5 Controller",
-    //   category: "Gaming",
-    //   price: 120,
-    //   discount: 240,
-    //   isOffered: true,
-    //   isAdded: false
-    // },
-    // {
-    //   id: 3,
-    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-    //   name: "PS5 Controller",
-    //   category: "Gaming",
-    //   price: 120,
-    //   discount: 240,
-    //   isOffered: true,
-    //   isAdded: false
-    // },
-    // {
-    //   id: 4,
-    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-    //   name: "PS5 Controller",
-    //   category: "Gaming",
-    //   price: 120,
-    //   discount: 240,
-    //   isOffered: true,
-    //   isAdded: false
-    // },
-    // {
-    //   id: 5,
-    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-    //   name: "PS5 Controller",
-    //   category: "Gaming",
-    //   price: 120,
-    //   discount: 240,
-    //   isOffered: true,
-    //   isAdded: false
-    // },
-    // {
-    //   id: 6,
-    //   image: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-    //   name: "PS5 Controller",
-    //   category: "Gaming",
-    //   price: 120,
-    //   discount: 240,
-    //   isOffered: true,
-    //   isAdded: false
-    // },
   ];
+
+  function timer() {
+
+  const saleEndDate = new Date("2026-06-17T23:59:00");
+
+  const intervalId = setInterval(() => {
+
+    const nowDate = new Date();
+
+    const difference = saleEndDate.getTime() - nowDate.getTime();
+
+    if (difference <= 0) {
+      clearInterval(intervalId);
+      console.log("Sale Ended");
+      return;
+    }
+
+    const days = Math.floor(
+      difference / (1000 * 60 * 60 * 24)
+    );
+
+    const formattedDays = String(days).padStart(2, "0");
+
+    const hours = Math.floor(
+      (difference % (1000 * 60 * 60 * 24)) /
+      (1000 * 60 * 60)
+    );
+
+    const formattedHours = String(hours).padStart(2, "0");
+
+    const minutes = Math.floor(
+      (difference % (1000 * 60 * 60)) /
+      (1000 * 60)
+    );
+
+    const formattedMinutes = String(minutes).padStart(2, "0");
+
+    const seconds = Math.floor(
+      (difference % (1000 * 60)) / 1000
+    );
+
+    const formattedSeconds = String(seconds).padStart(2, "0");
+
+    setDays(formattedDays);
+    setHours(formattedHours);
+    setMinutes(formattedMinutes);
+    setSeconds(formattedSeconds);
+
+
+
+    // console.log(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+
+  }, 1000);
+}
+
+timer();
 
   return (
     <div className="flex min-h-screen w-full items-center mb-10">
@@ -199,28 +211,28 @@ export default function FlashSale() {
               <div className="flex items-center text-[#DB4444]">
                 <div className="flex flex-col items-start">
                   <span className="text-sm font-medium text-black">Days</span>
-                  <span className="text-2xl font-bold text-black md:text-3xl">05</span>
+                  <span className="text-2xl font-bold text-black md:text-3xl">{days}</span>
                 </div>
 
                 <span className="mx-1 text-2xl md:mx-4 md:text-3xl">:</span>
 
                 <div className="flex flex-col items-start">
                   <span className="text-sm font-medium text-black">Hours</span>
-                  <span className="text-2xl font-bold text-black md:text-3xl">12</span>
+                  <span className="text-2xl font-bold text-black md:text-3xl">{hours}</span>
                 </div>
 
                 <span className="mx-1 text-2xl md:mx-4 md:text-3xl">:</span>
 
                 <div className="flex flex-col items-center">
                   <span className="text-sm font-medium text-black">Minutes</span>
-                  <span className="text-2xl font-bold text-black md:text-3xl">30</span>
+                  <span className="text-2xl font-bold text-black md:text-3xl">{minutes}</span>
                 </div>
 
                 <span className="mx-1 text-2xl md:mx-4 md:text-3xl">:</span>
 
                 <div className="flex flex-col items-center">
                   <span className="text-sm font-medium text-black">Seconds</span>
-                  <span className="text-2xl font-bold text-black md:text-3xl">45</span>
+                  <span className="text-2xl font-bold text-black md:text-3xl">{seconds}</span>
                 </div>
               </div>
             </div>

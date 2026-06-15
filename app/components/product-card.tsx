@@ -9,6 +9,7 @@ import { ProductImage } from "../types/product-images";
 import { Vendor } from "../types/vendor";
 import { Category } from "../types/category";
 import { getImageUrl } from "../admin/utils/getImageUrl";
+import { faStar } from "@fortawesome/free-solid-svg-icons";
 
 interface Product {
   id: string;
@@ -39,6 +40,10 @@ interface Product {
   discount?: number;
   isOffered?: boolean;
   isAdded?: boolean
+
+  totalReviews: number;
+  avgRating: number;
+
 
 
 
@@ -74,7 +79,7 @@ export default function ProductCard({product}: ProductCardProps) {
       <div className="px-2">
 
         {/* CARD */}
-        <div className="group h-87.5 overflow-hidden bg-white rounded-lg">
+        <div className="group overflow-hidden bg-white rounded-lg">
 
           {/* IMAGE */}
           <div className="relative flex h-62.5 items-center justify-center bg-[#F5F5F5]">
@@ -166,6 +171,27 @@ export default function ProductCard({product}: ProductCardProps) {
                 </span>
               )}
 
+            </div>
+
+            <div className="mt-2 flex items-center gap-2">
+    
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <FontAwesomeIcon
+                    key={star}
+                    icon={faStar}
+                    className={`text-sm ${
+                      star <= Math.round(product.avgRating)
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <span className="text-sm text-gray-500">
+                ({product.totalReviews})
+              </span>
             </div>
 
           </div>
