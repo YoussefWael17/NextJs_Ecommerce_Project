@@ -6,13 +6,26 @@ import Autoplay from "embla-carousel-autoplay";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import ProductCard from "./product-card";
+import { Product } from "../types/product";
+import axios from "axios";
+import ProductCardSkeleton from "./skeletonUI/product-card-skeleton";
+import FlashSaleSkeleton from "./skeletonUI/flash-sale-skeleton";
+
 
 export default function FlashSale() {
+
+  
 
   const [days, setDays] = useState("0");
   const [hours, setHours] = useState("0");
   const [minutes, setMinutes] = useState("0");
   const [seconds, setSeconds] = useState("0");
+
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [salesProducts, setSalesProducts] = useState<Product[]>([]);
+
+  const saleEndDate = salesProducts?.[0]?.saleEndDate;
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
@@ -41,157 +54,77 @@ export default function FlashSale() {
     emblaApi.on("select", onSelect);
     onSelect();
 
-    emblaApi.plugins()?.autoplay?.play();
+    emblaApi.plugins()?.autoplay;
+    // emblaApi.plugins()?.autoplay?.play();
   }, [emblaApi, onSelect]);
 
-  const products = [
-    {
-      id: "1",
-      thumbnail: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      title: "PS5 Controller",
-      category: {
-        name: "Gaming",
-        id: "15523",
-      },
-      price: 120,
-      discount: 240,
-      isOffered: true,
-      isAdded: false,
-      totalReviews: 200,
-      avgRating: 4.5
-    },
-    {
-      id: "2",
-      thumbnail: "https://www.pngmart.com/files/22/iPhone-14-PNG-Image.png",
-      title: "Iphone 14 Pro Max",
-      category: {
-        name: "Phones",
-        id: "123",
-      },
-      price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false,
-      totalReviews: 200,
-      avgRating: 4.5
-    },
-    {
-      id: "3",
-      thumbnail: "https://www.pngmart.com/files/23/Apple-Watch-PNG-Pic.png",
-      title: "Apple Watch",
-      category: {
-        name: "Watches",
-        id: "1223",
-      },
-      price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false,
-      totalReviews: 200,
-      avgRating: 4.5
-    },
-    {
-      id: "4",
-      thumbnail: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      title: "PS5 Controller",
-      category: {
-        name: "Gaming",
-        id: "10023",
-      },
-      price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false,
-      totalReviews: 200,
-      avgRating: 4.5
-    },
-    {
-      id: "5",
-      thumbnail: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      title: "PS5 Controller",
-      category: {
-        name: "Gaming",
-        id: "12355",
-      },
-      price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false,
-      totalReviews: 200,
-      avgRating: 4.5
-    },
-    {
-      id: "6",
-      thumbnail: "https://www.pngmart.com/files/7/PS4-PNG-Transparent-Image.png",
-      title: "PS5 Controller",
-      category: {
-        name: "Gaming",
-        id: "123",
-      },
-      price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false,
-      totalReviews: 200,
-      avgRating: 2.5
-    },
-  ];
-
-  function timer() {
-
-  const saleEndDate = new Date("2026-06-17T23:59:00");
-
-  const intervalId = setInterval(() => {
-
-    const nowDate = new Date();
-
-    const difference = saleEndDate.getTime() - nowDate.getTime();
-
-    if (difference <= 0) {
-      clearInterval(intervalId);
-      console.log("Sale Ended");
-      return;
+  async function getFlashSales() {
+    try {
+      setIsLoading(true)
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/flash-sales`)
+      console.log(data)
+      if(data.success){
+        setSalesProducts(data.data);
+      }else{
+        setSalesProducts([]);
+      } 
+      setIsLoading(false)
+    } catch (error) {
+      console.log(error)
     }
+  }
 
-    const days = Math.floor(
-      difference / (1000 * 60 * 60 * 24)
-    );
+  useEffect(()=>{
+    getFlashSales();
+  }, [])
 
-    const formattedDays = String(days).padStart(2, "0");
+  useEffect(() => {
+    if (!salesProducts.length || !salesProducts[0].saleEndDate) return;
 
-    const hours = Math.floor(
-      (difference % (1000 * 60 * 60 * 24)) /
-      (1000 * 60 * 60)
-    );
+    const endDate = new Date(salesProducts[0].saleEndDate);
 
-    const formattedHours = String(hours).padStart(2, "0");
+    const intervalId = setInterval(() => {
+      const now = new Date();
+      const diff = endDate.getTime() - now.getTime();
 
-    const minutes = Math.floor(
-      (difference % (1000 * 60 * 60)) /
-      (1000 * 60)
-    );
+      if (diff <= 0) {
+        clearInterval(intervalId);
+        setDays("00");
+        setHours("00");
+        setMinutes("00");
+        setSeconds("00");
+        return;
+      }
 
-    const formattedMinutes = String(minutes).padStart(2, "0");
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor(
+        (diff % (1000 * 60 * 60 * 24)) /
+          (1000 * 60 * 60)
+      );
+      const m = Math.floor(
+        (diff % (1000 * 60 * 60)) /
+          (1000 * 60)
+      );
+      const s = Math.floor(
+        (diff % (1000 * 60)) / 1000
+      );
 
-    const seconds = Math.floor(
-      (difference % (1000 * 60)) / 1000
-    );
+      setDays(String(d).padStart(2, "0"));
+      setHours(String(h).padStart(2, "0"));
+      setMinutes(String(m).padStart(2, "0"));
+      setSeconds(String(s).padStart(2, "0"));
+    }, 1000);
 
-    const formattedSeconds = String(seconds).padStart(2, "0");
+    return () => clearInterval(intervalId);
+  }, [salesProducts]);
 
-    setDays(formattedDays);
-    setHours(formattedHours);
-    setMinutes(formattedMinutes);
-    setSeconds(formattedSeconds);
+  if (isLoading) {
+    return <FlashSaleSkeleton />;
+  }
 
-
-
-    // console.log(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-
-  }, 1000);
-}
-
-timer();
+  if (salesProducts.length === 0) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen w-full items-center mb-10">
@@ -273,7 +206,7 @@ timer();
           {/* TRACK */}
           <div className="flex">
 
-            {products.map((product) => (
+            {salesProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
 

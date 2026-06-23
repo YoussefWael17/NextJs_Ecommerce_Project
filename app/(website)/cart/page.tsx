@@ -1,4 +1,7 @@
 "use client"
+import { getImageUrl } from '@/app/admin/utils/getImageUrl';
+import CartSkeleton from '@/app/components/skeletonUI/cart-skeleton';
+import { cartContext } from '@/app/context/cartContext';
 import { CartItem } from '@/app/types/cart';
 import Link from 'next/link'
 import React, { useContext, useEffect, useState } from 'react'
@@ -8,198 +11,105 @@ import { toast } from 'sonner';
 
 export default function CartPage() {
 
-  const mockTestData = [
-  {
-    id: "10e9101e-6aa0-4f72-9303-d30cfa310761",
-    cartId: "12029ea8-839a-4cb5-9fb1-f8bfbaded36d",
-    quantity: 2,
-    variantId: "4067d35c-b3d8-4556-8de8-dabd3d39c4eb",
-    createdAt: "2026-06-04T00:54:17.378Z",
-    variant: {
-      id: "4067d35c-b3d8-4556-8de8-dabd3d39c4eb",
-      sku: "NAM270-RED-XS",
-      price: 150,
-      discountPrice: 140,
-      stock: 10,
-      colorId: "8fc1fe0f-6f6a-42db-bfea-f25d33b5e5a4",
-      sizeId: "326",
-      color: {
-        id: "8fc1fe0f-6f6a-42db-bfea-f25d33b5e5a4",
-        name: "Red",
-        hexCode: "#ff0000",
-      },
-      size: {
-        id: "326",
-        name: "XS",
-      },
-      product: {
-        id: "27c0d55c-d30a-4097-8d96-374cfcb790ea",
-        title: "Nike Air Max 270",
-        slug: "nike-air-max-270",
-        description:
-          "Comfortable and stylish running shoes for everyday wear.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",
-      },
-    },
-  },
-  {
-    id: "20e9101e-6aa0-4f72-9303-d30cfa310762",
-    cartId: "12029ea8-839a-4cb5-9fb1-f8bfbaded36d",
-    quantity: 1,
-    variantId: "5067d35c-b3d8-4556-8de8-dabd3d39c4ec",
-    createdAt: "2026-06-04T00:54:17.378Z",
-    variant: {
-      id: "5067d35c-b3d8-4556-8de8-dabd3d39c4ec",
-      sku: "ADI500-BLK-M",
-      price: 180,
-      discountPrice: 165,
-      stock: 8,
-      color: {
-        id: "1",
-        name: "Black",
-        hexCode: "#000000",
-      },
-      size: {
-        id: "2",
-        name: "M",
-      },
-      product: {
-        id: "2",
-        title: "Adidas Ultraboost",
-        slug: "adidas-ultraboost",
-        description: "Premium running shoes with responsive cushioning.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=500",
-      },
-    },
-  },
-  {
-    id: "30e9101e-6aa0-4f72-9303-d30cfa310763",
-    cartId: "12029ea8-839a-4cb5-9fb1-f8bfbaded36d",
-    quantity: 3,
-    variantId: "6067d35c-b3d8-4556-8de8-dabd3d39c4ed",
-    createdAt: "2026-06-04T00:54:17.378Z",
-    variant: {
-      id: "6067d35c-b3d8-4556-8de8-dabd3d39c4ed",
-      sku: "PUMA-RS-WHT-L",
-      price: 120,
-      discountPrice: 99,
-      stock: 15,
-      color: {
-        id: "3",
-        name: "White",
-        hexCode: "#ffffff",
-      },
-      size: {
-        id: "4",
-        name: "L",
-      },
-      product: {
-        id: "3",
-        title: "Puma RS-X",
-        slug: "puma-rs-x",
-        description: "Retro-inspired sneakers with bold styling.",
-        thumbnail:
-          "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=500",
-      },
-    },
-  },
-];
+  const [ cartItems, setCartItems ] = useState<CartItem[]>([]);
+  const cart = useContext(cartContext);
 
-  const [ cartItems, setCartItems ] = useState<CartItem[]>(mockTestData);
-
-  // const [ cartItems, setCartItems ] = useState<CartItem[]>([]);
-  // const cart = useContext(cartContext);
+  const [ isLoading, setIsLoading ] = useState(false)
   
-  // async function getCart() {
-  //   try {
-  //     if (!cart) return;
+  async function getCart() {
+    try {
+      setIsLoading(true)
+      if (!cart) return;
 
-  //     const res = await cart?.getUserCart();
-  //     console.log(res.data);
+      const res = await cart?.getUserCart();
+      console.log(res.data);
 
-  //     if(res.data.success === true){
-  //       setCartItems(res.data.data.items);
-  //       console.log(res.data.data.items)
-  //       // console.log(mockData);
-  //     }
+      if(res.data.success === true){
+        setCartItems(res.data.data.items);
+        // console.log(res.data.data.items)
+        // console.log(mockData);
+        setIsLoading(false)
+      }
       
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
-
-  // async function updateQuantity(cartItemId: string, quantity: number) {
-  //   try {
-  //     if (!cart) return;
-
-  //     const res = await cart?.updateCartItemQuantity(cartItemId, quantity);
-
-  //     console.log(res)
-
-  //     if(res.data.success === true){
-  //       toast.success("Item Quantity Updated Successfully")
-  //       getCart();
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
-
-  // async function removeItem(cartItemId: string) {
-  //   try {
-  //     if (!cart) return;
-
-  //     const res = await cart?.removeCartItem(cartItemId);
-
-  //     console.log(res)
-
-  //     if(res.data.success === true){
-  //       toast.success("Item Deleted Successfully")
-  //       getCart();
-  //     }
-      
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-    
-  // }
-
-  // useEffect(() => {
-  //   getCart();
-  // }, []);
-
-  if(cartItems.length === 0){
-    return (
-      <div className="flex flex-col items-center justify-center py-24 text-center min-h-screen">
-
-        {/* ICON */}
-        <div className="w-20 h-20 flex items-center justify-center rounded-full bg-gray-100 mb-5">
-          <FaShoppingCart className="text-3xl text-gray-500" />
-        </div>
-
-        {/* TITLE */}
-        <h2 className="text-2xl font-semibold text-gray-800">
-          Your cart is empty
-        </h2>
-
-        {/* DESCRIPTION */}
-        <p className="text-gray-500 mt-2 max-w-sm">
-          Looks like you haven’t added anything yet. Start exploring our products and add your favorites.
-        </p>
-
-        {/* BUTTON */}
-        <Link
-          href="/"
-          className="mt-6 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition"
-        >
-          Go Shopping
-        </Link>
-
-      </div>
-    )
+    } catch (error) {
+      console.log(error)
+    }
   }
+
+  async function updateQuantity(cartItemId: string, quantity: number) {
+    try {
+      if (!cart) return;
+
+      const res = await cart?.updateCartItemQuantity(cartItemId, quantity);
+
+      console.log(res)
+
+      if(res.data.success === true){
+        toast.success("Item Quantity Updated Successfully")
+        getCart();
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function removeItem(cartItemId: string) {
+    try {
+      if (!cart) return;
+
+      const res = await cart?.removeCartItem(cartItemId);
+
+      console.log(res)
+
+      if(res.data.success === true){
+        toast.success("Item Deleted Successfully")
+        getCart();
+      }
+      
+    } catch (error) {
+      console.log(error)
+    }
+    
+  }
+
+  useEffect(() => {
+    getCart();
+  }, []);
+
+  if (isLoading) {
+    return <CartSkeleton />;
+  }
+
+  // if(cartItems.length === 0){
+  //   return (
+  //     <div className="flex flex-col items-center justify-center py-24 text-center min-h-screen">
+
+  //       {/* ICON */}
+  //       <div className="w-20 h-20 flex items-center justify-center rounded-full bg-gray-100 mb-5">
+  //         <FaShoppingCart className="text-3xl text-gray-500" />
+  //       </div>
+
+  //       {/* TITLE */}
+  //       <h2 className="text-2xl font-semibold text-gray-800">
+  //         Your cart is empty
+  //       </h2>
+
+  //       {/* DESCRIPTION */}
+  //       <p className="text-gray-500 mt-2 max-w-sm">
+  //         Looks like you haven’t added anything yet. Start exploring our products and add your favorites.
+  //       </p>
+
+  //       {/* BUTTON */}
+  //       <Link
+  //         href="/"
+  //         className="mt-6 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition"
+  //       >
+  //         Go Shopping
+  //       </Link>
+
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="container mx-auto px-4 py-10 mt-15 min-h-screen">
@@ -248,14 +158,14 @@ export default function CartPage() {
               {/* IMAGE */}
               <div className="relative">
                 <img
-                  src={item.variant.product.thumbnail}
+                  src={getImageUrl(item.variant.product.thumbnail)}
                   alt={item.variant.product.title}
-                  className="w-16 h-16 rounded-xl object-cover"
+                  className="w-16 h-16 rounded-xl object-contain"
                 />
 
                 {/* REMOVE BUTTON */}
                 <button
-                  // onClick={()=> {removeItem(item.id)}}
+                  onClick={()=> {removeItem(item.id)}}
                   className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-[#DB4444] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer"
                 >
                   <FaTimes className="text-[12px]" />
@@ -300,7 +210,7 @@ export default function CartPage() {
               <div className="flex items-center border rounded-xl overflow-hidden">
 
                 <button
-                  // onClick={ () => {item.quantity > 1 && updateQuantity(item.id, item.quantity - 1)} } 
+                  onClick={ () => {item.quantity > 1 && updateQuantity(item.id, item.quantity - 1)} } 
                   className="px-4 py-2 text-lg hover:bg-[#DB4444] hover:text-white transition duration-300">
                   -
                 </button>
@@ -310,7 +220,7 @@ export default function CartPage() {
                 </span>
 
                 <button
-                  // onClick={()=>{ updateQuantity(item.id, item.quantity+1)}}
+                  onClick={()=>{ updateQuantity(item.id, item.quantity+1)}}
                   className="px-4 py-2 text-lg hover:bg-[#DB4444] hover:text-white transition duration-300">
                   +
                 </button>

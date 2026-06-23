@@ -76,7 +76,7 @@ export default function TeamSection() {
 
   return (
     <div className="flex min-h-screen w-full items-center mb-10">
-      <div className="mx-auto w-full max-w-screen-xl px-4">
+      <div className="mx-auto w-full max-w-7xl px-4">
 
         {/* EMBLA VIEWPORT */}
         <div className="overflow-hidden" ref={emblaRef}>
@@ -88,7 +88,7 @@ export default function TeamSection() {
                 className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0"
               >
                 {/* CARD */}
-                <div className="bg-white shadow-md hover:shadow-xl transition-all duration-300 h-[550px] flex flex-col group hover:-translate-y-2 overflow-hidden">
+                <div className="bg-white shadow-md hover:shadow-xl transition-all duration-300 h-137.5 flex flex-col group hover:-translate-y-2 overflow-hidden">
 
                   {/* IMAGE */}
                   <div className="h-[70%] bg-gray-50 flex items-center justify-center">

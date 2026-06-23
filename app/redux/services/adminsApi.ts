@@ -118,7 +118,7 @@ export const adminsApi = createApi({
 
         headers.set(
             "authorization",
-            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZTI3ZjgwMy1hOTJmLTRkMTQtOWQxOC04MTc4YzBjMDAxZmQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODA2NzcyODcsImV4cCI6MTc4MTI4MjA4N30.S5gdl2yn0aPuJVKXmjJyOJDhKSrCCJLBjAt8ak8LCAg`
+            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZTI3ZjgwMy1hOTJmLTRkMTQtOWQxOC04MTc4YzBjMDAxZmQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODIwNjU0NzUsImV4cCI6MTc4MjY3MDI3NX0.oeAg6aMWs-9g7l8KCQJ43BtmQap6GQAUfAZ6knQ5kgE`
         );
 
         return headers;

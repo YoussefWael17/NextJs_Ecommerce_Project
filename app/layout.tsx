@@ -10,6 +10,7 @@ import Script from "next/script";
 import Providers from "./providers";
 import { AuthContextProvider } from "./context/authContext";
 import { CartContextProvider } from "./context/cartContext";
+import { WishlistContextProvider } from "./context/wishlistContext";
 
 
 
@@ -45,6 +46,7 @@ export default function RootLayout({
         <body className="min-h-full flex flex-col">
           <AuthContextProvider>
             <CartContextProvider>
+              <WishlistContextProvider>
 
                 <Providers>
 
@@ -79,6 +81,7 @@ export default function RootLayout({
 
                 </Providers>
 
+                  </WishlistContextProvider>
                 </CartContextProvider>
           </AuthContextProvider>
 

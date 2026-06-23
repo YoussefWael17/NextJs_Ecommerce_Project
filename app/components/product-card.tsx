@@ -3,71 +3,67 @@
 import { faHeart, faEye, faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "sonner";
-import React from "react";
-import { Variant } from "../types/variant";
-import { ProductImage } from "../types/product-images";
-import { Vendor } from "../types/vendor";
-import { Category } from "../types/category";
 import { getImageUrl } from "../admin/utils/getImageUrl";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { ProductCardUI } from "../types/product";
+import { useRouter } from "next/navigation";
+import { useContext, useState } from "react";
+import { cartContext } from "../context/cartContext";
+import { Variant } from "../types/variant";
+import { wishlistContext } from "../context/wishlistContext";
 
-interface Product {
-  id: string;
-
-  title: string;
-  
-  slug?: string;
-  description?: string;
-  thumbnail: string;
-
-  isActive?: boolean;
-  isSale?: boolean;
-
-  category: Category;
-  categoryId?: string;
-
-
-  vendorId?: string;
-  vendor?: Vendor;
-
-  variants?: Variant[];
-  images?: ProductImage[];
-
-  createdAt?: string;
-  updatedAt?: string;
-
-  price?: number;
-  discount?: number;
-  isOffered?: boolean;
-  isAdded?: boolean
-
-  totalReviews: number;
-  avgRating: number;
-
-
-
-
-  
-  
-  
-  
-
-  
-
-  
-}
 
 interface ProductCardProps {
-  product: Product;
+  product: ProductCardUI;
 }
-
-
-
-
 
 
 export default function ProductCard({product}: ProductCardProps) {
-  const { isOffered, isAdded } = product;
+
+  const router = useRouter();
+  const cart = useContext(cartContext)
+  const wishlist = useContext(wishlistContext);
+
+  // const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  
+  function navigateToProductDetails(id: string) {
+    return router.push(`/products/${id}`)
+  }
+
+  async function addVaraintToCart(varId: string, quantity: number) {
+      try {
+        if (!cart) return;
+  
+        const res = await cart?.addToCart(varId, quantity);
+  
+        console.log(res)
+  
+        if(res.data.success === true){
+          toast.success("Product Added To Cart Successfully")
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    async function addVaraintToWishlist(varId: string) {
+      try {
+        if (!cart) return;
+  
+        const res = await wishlist?.addItemToWishlist(varId);
+  
+        console.log(res)
+  
+        if(res.data.success === true){
+          toast.success("Product Added To Wishlist Successfully")
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  
+  const isOffered = true;
+  const isAdded = false;
 
   const prices = product.variants?.map(v => v.price) ?? [];
   const maxPrice = prices.length ? Math.max(...prices) : 0;
@@ -87,13 +83,14 @@ export default function ProductCard({product}: ProductCardProps) {
             <img
               src={getImageUrl(product.thumbnail)}
               alt={product.title}
-              className="h-37.5 object-contain"
+              className="h-37.5 object-contain cursor-pointer"
+              onClick={()=> {navigateToProductDetails(product.id)}}
             />
 
             {/* OFFER BADGE */}
-            {isOffered && (
+            {Number(product?.salePercentage) > 0 && (
               <span className="absolute top-3 left-3 bg-[#DB4444] px-2 py-1 text-sm text-white rounded">
-                -{product.discount}%
+                -{product.salePercentage}%
               </span>
             )}
 
@@ -101,8 +98,15 @@ export default function ProductCard({product}: ProductCardProps) {
             <div className="absolute top-3 right-3 flex flex-col gap-2">
 
               {!isAdded && (
-                <button onClick={() =>
-                  toast.success("Product Added To Wishlist")
+                <button 
+                  onClick={() => {
+                if (!product.variants?.[0]?.id) {
+                  toast.error("Product is unavailable");
+                  return;
+                }
+                addVaraintToWishlist(product.variants?.[0]?.id);
+                
+              }
                 } 
                 className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition">
                   <FontAwesomeIcon icon={faHeart} />
@@ -127,8 +131,16 @@ export default function ProductCard({product}: ProductCardProps) {
 
             {/* ADD TO CART */}
             <button
-              onClick={() =>
-                toast.success("Product added to cart")
+              onClick={() => {
+                if (!product.variants?.[0]?.id) {
+                  toast.error("Product is unavailable");
+                  return;
+                }
+                addVaraintToCart(product.variants?.[0]?.id, 1);
+                
+              }
+                
+                // toast.success("Product added to cart")
               }
               className="
                 absolute bottom-0 left-0 w-full
@@ -148,7 +160,7 @@ export default function ProductCard({product}: ProductCardProps) {
           </div>
 
           {/* CONTENT */}
-          <div className="p-4">
+          <div className="p-4 cursor-pointer" onClick={()=> {navigateToProductDetails(product.id)}}>
 
             <h3 className="text-lg font-bold">
               {product.title}
@@ -167,7 +179,7 @@ export default function ProductCard({product}: ProductCardProps) {
 
               {isOffered && (
                 <span className="text-sm text-gray-400 line-through">
-                  ${product.discount}
+                  ${product.salePercentage}
                 </span>
               )}
 

@@ -13,21 +13,12 @@ import axios from "axios";
 import { useAddProductMutation } from "@/app/redux/services/vendorsApi";
 import { Product } from "@/app/types/product";
 
-const getImageUrl = (img: unknown): string => {
-  if (!img) return "/product-placeholder.jpg";
-
-  if (typeof img === "string") return img;
-
-  if (img instanceof File) {
-    return URL.createObjectURL(img);
-  }
-
-  return "/product-placeholder.jpg";
-};
 
 
 
 export default function CreatePage() {
+
+   
 
     const [categoriesApi, setCategoriesApi] = useState([]);
 
@@ -95,8 +86,13 @@ export default function CreatePage() {
 
             formData.append("thumbnail", values.thumbnail as File);
 
-            formData.append("isSale", values.isSale);
             formData.append("isActive", values.isActive);
+
+            if(values.isSale) {
+              formData.append("salePercentage", values.salePercentage);
+              formData.append("saleStartDate", values.saleStartDate);
+              formData.append("saleEndDate", values.saleEndDate);
+            }
 
             await addProduct(formData).unwrap();
 
@@ -115,8 +111,11 @@ export default function CreatePage() {
             description: "",
             thumbnail: null,
             categoryId: "",
-            isSale: false,
             isActive: true,
+            isSale: false,
+            salePercentage: "",
+            saleStartDate: "",
+            saleEndDate: "",
             images: [
               {
                 image: null,
@@ -300,19 +299,18 @@ export default function CreatePage() {
 
                 {/* Is Sale */}
                 <div className="flex items-center justify-between  p-3">
-                  
-
                   <label className="relative inline-flex cursor-pointer items-center">
                     <input
                       type="checkbox"
+                      className="peer sr-only"
                       name="isSale"
                       checked={formik.values.isSale}
                       onChange={formik.handleChange}
-                      className="peer sr-only"
                     />
-                    
-                    <div className="peer h-6 w-11 rounded-full bg-gray-300 peer-checked:bg-[#DB4444] after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-full"></div>
-                  
+                  {/* track */}
+                  <div className="peer h-6 w-11 rounded-full bg-gray-300 peer-checked:bg-[#DB4444] after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-full">
+                  </div>
+
                   <span className="font-medium ml-4">On Sale</span>
                   </label>
                 </div>
@@ -335,6 +333,110 @@ export default function CreatePage() {
                   <span className="font-medium ml-4">Active</span>
                   </label>
                 </div>
+
+                {/* {isSale && (
+                  <div className="mt-4 p-4 border rounded-lg bg-gray-50 space-y-3">
+                    
+                    <div>
+                      <label className="block text-sm font-medium">Sale Percentage</label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 20%"
+                        className="w-full mt-1 p-2 border rounded"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium">Start Date</label>
+                      <input
+                        type="datetime-local"
+                        className="w-full mt-1 p-2 border rounded"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium">End Date</label>
+                      <input
+                        type="datetime-local"
+                        className="w-full mt-1 p-2 border rounded"
+                      />
+                    </div>
+
+                  </div>
+                )} */}
+
+                {formik.values.isSale && (
+                  <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm space-y-5">
+
+                    {/* HEADER */}
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-[#DB4444]"></span>
+                      <h3 className="text-sm font-semibold text-gray-800">
+                        Sale Configuration
+                      </h3>
+                    </div>
+
+                    {/* GRID */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    {/* PERCENT */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Discount %
+                      </label>
+
+                      <input
+                        type="number"
+                        name="salePercentage"
+                        value={formik.values.salePercentage}
+                        onChange={formik.handleChange}
+                        placeholder="e.g. 20"
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-[#DB4444]"
+                      />
+                    </div>
+
+                    {/* START */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Start Date
+                      </label>
+
+                      <input
+                        type="datetime-local"
+                        name="saleStartDate"
+                        value={formik.values.saleStartDate}
+                        onChange={formik.handleChange}
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-[#DB4444]"
+                      />
+                    </div>
+
+                    {/* END */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        End Date
+                      </label>
+
+                      <input
+                        type="datetime-local"
+                        name="saleEndDate"
+                        value={formik.values.saleEndDate}
+                        onChange={formik.handleChange}
+                        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-[#DB4444]"
+                      />
+                    </div>
+
+                  </div>
+
+                  {/* INFO NOTE */}
+                  <p className="text-xs text-gray-500">
+                    Sale will be active only between start and end date.
+                  </p>
+
+                  </div>
+                )}
 
               </div>
 

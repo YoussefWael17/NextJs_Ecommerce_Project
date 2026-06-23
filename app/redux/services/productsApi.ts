@@ -16,10 +16,16 @@ export const productsApi = createApi({
                 query: () => `/`,
                 providesTags: ["Products"],
             }),
+
+            getSingleProduct: builder.query<{ success: Boolean, data:Product}, string>({
+                query: (id) => `/${id}`,
+                providesTags: ["Products"],
+            }),
         })
 })
 
 
 export const {
-    useGetProductsQuery
+    useGetProductsQuery,
+    useGetSingleProductQuery
 } = productsApi;

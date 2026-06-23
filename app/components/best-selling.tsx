@@ -1,9 +1,36 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "./product-card";
 
+
+import axios from "axios";
+import { ProductUI } from "../types/product";
+import ProductCardSkeleton from "./skeletonUI/product-card-skeleton";
+
 export default function BestSelling() {
+  const [ bestSellingProducts, setBestSellingProducts ] = useState<ProductUI []>([]);
+  const [ isloading, setIsLoading ] = useState(false);
+
+  async function getBestSellingProducts() {
+    try {
+      setIsLoading(true);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/new-arrivals`)
+      // const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/best-sellers`)
+      console.log(res)
+      setBestSellingProducts(res.data.data);
+      setIsLoading(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  
+
+  useEffect(()=> {
+    getBestSellingProducts()
+  }, [])
+
   const products = [
     {
       id: "1",
@@ -14,9 +41,9 @@ export default function BestSelling() {
         id: "15523",
       },
       price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false
+      salePercentage: 240,
+      totalReviews: 200,
+      avgRating: 5
     },
     {
       id: "2",
@@ -27,9 +54,9 @@ export default function BestSelling() {
         id: "123",
       },
       price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false
+      salePercentage: 240,
+      totalReviews: 200,
+      avgRating: 5
     },
     {
       id: "3",
@@ -40,9 +67,9 @@ export default function BestSelling() {
         id: "1223",
       },
       price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false
+      salePercentage: 240,
+      totalReviews: 200,
+      avgRating: 5
     },
     {
       id: "4",
@@ -53,9 +80,9 @@ export default function BestSelling() {
         id: "10023",
       },
       price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false
+      salePercentage: 240,
+      totalReviews: 200,
+      avgRating: 5
     },
     {
       id: "5",
@@ -66,9 +93,9 @@ export default function BestSelling() {
         id: "12355",
       },
       price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false
+      salePercentage: 240,
+      totalReviews: 200,
+      avgRating: 5
     },
     {
       id: "6",
@@ -79,9 +106,9 @@ export default function BestSelling() {
         id: "123",
       },
       price: 120,
-      discount: 240,
-      isOffered: false,
-      isAdded: false
+      salePercentage: 240,
+      totalReviews: 200,
+      avgRating: 5
     },
   ];
 
@@ -118,13 +145,34 @@ export default function BestSelling() {
         </div>
 
         {/* GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"> */}
 
-        </div>
+          {isloading ? (
+            <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                  >
+                    <div className="flex flex-col gap-4 px-2">
+                      <ProductCardSkeleton />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {bestSellingProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
+
+          
+
+        {/* </div> */}
 
         <hr className="hidden md:block border-0 h-px bg-gray-200 mt-10" />
 

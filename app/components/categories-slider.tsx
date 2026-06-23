@@ -7,10 +7,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import React, { useCallback, useEffect, useState } from 'react'
+import { useGetCategoriesQuery } from '../redux/services/categoriesApi';
+
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
+const iconMap: Record<string, IconDefinition> = {
+  faMobileScreen,
+  faLaptop,
+  faCamera,
+  faHeadphones,
+  faGamepad,
+  faTv,
+  faShirt,
+};
+
 
 export default function CategoriesSlider() {
 
     const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const { data, refetch, isLoading, isFetching} = useGetCategoriesQuery();
+
+    const categories = data?.data ?? [];
+    
     
       const [emblaRef, emblaApi] = useEmblaCarousel(
         {
@@ -40,23 +59,24 @@ export default function CategoriesSlider() {
         emblaApi.on("select", onSelect);
         onSelect();
     
-        emblaApi.plugins()?.autoplay?.play();
+        emblaApi.plugins()?.autoplay;
+        // emblaApi.plugins()?.autoplay?.play();
       }, [emblaApi, onSelect]);
     
-      const categories = [
-    { name: "Phones", icon: faMobileScreen },
-    { name: "Laptops", icon: faLaptop },
-    { name: "Camera", icon: faCamera },
-    { name: "Headphones", icon: faHeadphones },
-    { name: "Gaming", icon: faGamepad },
-    { name: "TV", icon: faTv },
-    { name: "Fashion", icon: faShirt },
-  ];
+  //     const categories = [
+  //   { name: "Phones", icon: faMobileScreen },
+  //   { name: "Laptops", icon: faLaptop },
+  //   { name: "Camera", icon: faCamera },
+  //   { name: "Headphones", icon: faHeadphones },
+  //   { name: "Gaming", icon: faGamepad },
+  //   { name: "TV", icon: faTv },
+  //   { name: "Fashion", icon: faShirt },
+  // ];
 
   return (
     <div className="flex w-full items-center mb-17.5">
 
-      <div className="mx-auto w-full max-w-screen-xl px-4">
+      <div className="mx-auto w-full max-w-7xl px-4">
         
         <div className="flex w-full flex-row items-end justify-between px-4 mb-10">
           <div className="flex flex-col">
@@ -106,7 +126,7 @@ export default function CategoriesSlider() {
           {/* TRACK */}
           <div className="flex">
 
-            {categories.map((cat, index) => (
+            {/* {categories?.map((cat, index) => (
 
               <div
                 key={index}
@@ -118,15 +138,16 @@ export default function CategoriesSlider() {
                 "
               >
 
-                {/* INNER */}
+
                 <div className="px-2">
-                  <div className="group h-[150px] flex flex-col items-center justify-center gap-3 bg-white border border-gray-200 rounded-lg hover:bg-[#DB4444]  transition-colors duration-300 cursor-pointer">
+                  <div className="group h-37.5 flex flex-col items-center justify-center gap-3 bg-white border border-gray-200 rounded-lg hover:bg-[#DB4444]  transition-colors duration-300 cursor-pointer">
                     
                     <FontAwesomeIcon
                       icon={cat.icon}
                       className="group-hover:text-white transition-colors duration-300 text-[56px] text-black"
                     />
 
+    
                     <p className="group-hover:text-white transition-colors duration-300 text-[16px] font-medium text-black">
                       {cat.name}
                     </p>
@@ -135,13 +156,35 @@ export default function CategoriesSlider() {
                 </div>
 
               </div>
-            ))}
+            ))} */}
+            {categories.map((cat, index) => {
+              const icon = cat.icon ? iconMap[cat.icon] : null;
+
+              return (
+                <div key={index} className="flex-[0_0_16.666%] px-2">
+                  <div className="group h-37.5 flex flex-col items-center justify-center gap-3 bg-white border border-gray-200 rounded-lg hover:bg-[#DB4444] transition">
+
+                    {icon && (
+                      <FontAwesomeIcon
+                        icon={icon}
+                        className="group-hover:text-white text-[56px] text-black"
+                      />
+                    )}
+
+                    <p className="group-hover:text-white text-[16px] font-medium">
+                      {cat.name}
+                    </p>
+
+                  </div>
+                </div>
+              );
+            })}
 
           </div>
 
         </div>
 
-        <hr className="hidden md:block border-0 h-0.25 bg-gray-200 mt-[70px]" />
+        <hr className="hidden md:block border-0 h-px bg-gray-200 mt-17.5" />
 
       </div>
 

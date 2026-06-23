@@ -30,7 +30,7 @@ export default function NewArrival() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 lg:grid-rows-2">
         
         {/* PS5 */}
-        <div className="group relative min-h-[600px] overflow-hidden rounded bg-black p-8 lg:col-span-2 lg:row-span-2">
+        <div className="group relative min-h-150 overflow-hidden rounded bg-black p-8 lg:col-span-2 lg:row-span-2">
           
           {/* Content */}
           <div className="absolute bottom-8 left-8 z-20 max-w-xs">
@@ -63,10 +63,10 @@ export default function NewArrival() {
         </div>
 
         {/* Women Collection */}
-        <div className="group relative min-h-[285px] overflow-hidden rounded bg-black p-6 lg:col-span-2">
+        <div className="group relative min-h-71.25 overflow-hidden rounded bg-black p-6 lg:col-span-2">
           
           {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-transparent"></div>
 
           {/* Content */}
           <div className="absolute bottom-6 left-6 z-20 max-w-xs">
@@ -84,7 +84,7 @@ export default function NewArrival() {
           </div>
 
           {/* Image */}
-          <div className="absolute bottom-0 right-0 z-10 h-[100%] w-[55%] transition duration-500 group-hover:scale-105">
+          <div className="absolute bottom-0 right-0 z-10 h-full w-[55%] transition duration-500 group-hover:scale-105">
             <Image
               src={bag}
               alt="Women Collection"
@@ -95,7 +95,7 @@ export default function NewArrival() {
         </div>
 
         {/* Speakers */}
-        <div className="group relative min-h-[285px] overflow-hidden rounded bg-black p-6">
+        <div className="group relative min-h-71.25 overflow-hidden rounded bg-black p-6">
           
           {/* Glow */}
           <div className="absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/10 blur-3xl"></div>
@@ -117,7 +117,7 @@ export default function NewArrival() {
 
           {/* Image */}
           <div className="relative flex h-full items-center justify-center">
-            <div className="relative h-[170px] w-[170px] transition duration-500 group-hover:scale-110">
+            <div className="relative h-42.5 w-42.5 transition duration-500 group-hover:scale-110">
               <Image
                 src={speaker}
                 alt="Speaker"
@@ -129,7 +129,7 @@ export default function NewArrival() {
         </div>
 
         {/* Perfume */}
-        <div className="group relative min-h-[285px] overflow-hidden rounded bg-black p-6">
+        <div className="group relative min-h-71.25 overflow-hidden rounded bg-black p-6">
           
           {/* Glow */}
           <div className="absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/10 blur-3xl"></div>
@@ -151,7 +151,7 @@ export default function NewArrival() {
 
           {/* Image */}
           <div className="relative flex h-full items-center justify-center">
-            <div className="relative h-[150px] w-[150px] transition duration-500 group-hover:scale-110">
+            <div className="relative h-37.5 w-37.5 transition duration-500 group-hover:scale-110">
               <Image
                 src={perfume}
                 alt="Perfume"

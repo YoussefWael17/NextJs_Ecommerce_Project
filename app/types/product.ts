@@ -14,6 +14,8 @@ export interface Product {
   isActive: boolean;
   isSale: boolean;
 
+  price: number;
+
   categoryId: string;
   category: Category;
 
@@ -25,4 +27,56 @@ export interface Product {
 
   createdAt: string;
   updatedAt: string;
+
+  totalReviews: number;
+  avgRating: number;
+
+  salePercentage?: number,
+  saleStartDate?: string,
+  saleEndDate?: string,
+}
+
+export interface ProductUI {
+  id: string;
+  title: string;
+  thumbnail: string;
+
+  category: Category;
+
+  price: number;
+  // discount?: number;
+  // isOffered?: boolean;
+
+  variants?: Variant[];
+
+  // isAdded?: boolean;
+
+  totalReviews: number;
+  avgRating: number;
+
+  salePercentage?: number;
+  saleStartDate?: string;
+  saleEndDate?: string;
+}
+
+
+export interface ProductCardUI {
+  id: string;
+  title: string;
+  thumbnail: string;
+
+  category: {
+    id: string;
+    name: string;
+  };
+
+  price: number; 
+
+  variants?: Variant[];
+
+  salePercentage?: number;
+  saleEndDate?: string;
+
+  totalReviews: number;
+  avgRating: number;
 }

@@ -24,7 +24,7 @@ export const vendorsApi = createApi({
 
         headers.set(
             "authorization",
-            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODExODY2ODcsImV4cCI6MTc4MTc5MTQ4N30.vLCc_iSvsxc7k0rg4bm7INpXIsYVypQSBheQOq_h2lU`
+            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzgxOTU4MTMxLCJleHAiOjE3ODI1NjI5MzF9.C0BzD9GYiD8bAaFsa6EXIhiyHpmgmzywE5hme1y-HOU`
         );
 
         return headers;
