@@ -73,6 +73,7 @@ export interface ProductCardUI {
   price: number; 
 
   variants?: Variant[];
+  variant?: Variant;
 
   salePercentage?: number;
   saleEndDate?: string;

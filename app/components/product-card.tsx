@@ -9,16 +9,17 @@ import { ProductCardUI } from "../types/product";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import { cartContext } from "../context/cartContext";
-import { Variant } from "../types/variant";
 import { wishlistContext } from "../context/wishlistContext";
 
 
 interface ProductCardProps {
   product: ProductCardUI;
+  isAdded: boolean,
+  onRemove?: () => void;
 }
 
 
-export default function ProductCard({product}: ProductCardProps) {
+export default function ProductCard({product, isAdded, onRemove}: ProductCardProps) {
 
   const router = useRouter();
   const cart = useContext(cartContext)
@@ -29,6 +30,8 @@ export default function ProductCard({product}: ProductCardProps) {
   function navigateToProductDetails(id: string) {
     return router.push(`/products/${id}`)
   }
+
+  
 
   async function addVaraintToCart(varId: string, quantity: number) {
       try {
@@ -61,9 +64,28 @@ export default function ProductCard({product}: ProductCardProps) {
         console.log(error)
       }
     }
+
+    async function removeWishlistItem(wishlistItemId: string) {
+        try {
+          if (!wishlist) return;
+    
+          const res = await wishlist?.removeWishlistItem(wishlistItemId);
+    
+          console.log(res)
+    
+          if(res.data.success === true){
+            toast.success("Item Removed Successfully")
+            onRemove?.();
+          }
+          
+        } catch (error) {
+          console.log(error)
+        }
+        
+      }
   
   const isOffered = true;
-  const isAdded = false;
+  // const isAdded = false;
 
   const prices = product.variants?.map(v => v.price) ?? [];
   const maxPrice = prices.length ? Math.max(...prices) : 0;
@@ -117,13 +139,38 @@ export default function ProductCard({product}: ProductCardProps) {
                 <FontAwesomeIcon icon={faEye} />
               </button>
 
-              {isAdded && (
+              {/* {isAdded && (
                 <button
-                  onClick={() =>
-                    toast.error("Product Removed From Wishlist")
+                  onClick={() => {
+                    if (!product.variants?.id) {
+                  toast.error("Product is unavailable");
+                  return;
+                    }
+                    removeWishlistItem(product.variants?.id)
+                  }
+                    // toast.error("Product Removed From Wishlist")
                   }
                   className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition">
                     <FontAwesomeIcon icon={faTrashCan} />
+                </button>
+              )} */}
+
+              {isAdded && (
+                <button
+                  onClick={() => {
+                    const variantId = product.variant?.id;
+
+                    if (!variantId) {
+                      toast.error("Product is unavailable");
+                      return;
+                    }
+
+                    removeWishlistItem(variantId);
+                    
+                  }}
+                  className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition"
+                >
+                  <FontAwesomeIcon icon={faTrashCan} />
                 </button>
               )}
 

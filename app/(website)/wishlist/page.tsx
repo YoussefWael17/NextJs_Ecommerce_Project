@@ -4,14 +4,18 @@ import React, { useContext, useEffect, useState } from "react";
 import ProductCard from "../../components/product-card";
 import { wishlistContext } from "@/app/context/wishlistContext";
 import { ProductCardUI } from "@/app/types/product";
+import WishlistSkeleton from "@/app/components/skeletonUI/wishlist-skeleton";
+import Link from "next/link";
+import { FaHeart } from "react-icons/fa";
+import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function WishlistPage() {
 
-  const [ wishlistItems, setWishlistItems ] = useState<ProductCardUI[]>([]);
   const wishlist = useContext(wishlistContext);
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [ wishlistItems, setWishlistItems ] = useState<ProductCardUI[]>([]);
+  const [ isLoading, setIsLoading ] = useState(true);
+  const [ error, setError ] = useState<string | null>(null);
     
   async function getWishlist() {
     try {
@@ -22,10 +26,10 @@ export default function WishlistPage() {
 
       const res = await wishlist.getUserWishlist();
 
-      if (res.data.success) {
+      if (res?.data?.success) {
         setWishlistItems(res.data.data);
       } else{
-        setError("Failed to load wishlist");
+        setError("Failed To Load Wishlist");
       }
     } catch (error) {
       console.error(error);
@@ -39,28 +43,25 @@ export default function WishlistPage() {
     getWishlist();
   }, [])
 
-
-
   if (isLoading) {
     return (
-      <main className="container mx-auto py-10">
-        <div className="flex justify-center items-center min-h-75">
-          <p className="text-lg">Loading wishlist...</p>
-        </div>
-      </main>
+      <WishlistSkeleton />
     );
   }
 
   if (error) {
     return (
-      <main className="container mx-auto py-10">
+      <main className="container mx-auto py-10 md:h-screen flex items-center justify-center">
         <div className="flex flex-col items-center justify-center min-h-75 gap-4">
-          <p className="text-red-500">{error}</p>
+          <p className="text-gray-700">{error}</p>
 
           <button
             onClick={getWishlist}
-            className="rounded bg-[#DB4444] px-4 py-2 text-white"
+            className="flex items-center gap-2 border border-black rounded bg-black px-4 py-2 text-white cursor-pointer transition-all duration-300 hover:bg-white hover:text-black"
           >
+            <FontAwesomeIcon
+              icon={faRotateRight}
+            />
             Try Again
           </button>
         </div>
@@ -81,9 +82,7 @@ export default function WishlistPage() {
             <div className="flex flex-col">
               
               {wishlistItems.length === 0 ? (
-                <h1 className="text-[20px] font-semibold md:text-[20px]">
-                  Wishlist (0)
-                </h1>
+                null
               ) : (
                 <h1 className="text-[20px] font-semibold md:text-[20px]">
                   Wishlist ({wishlistItems.length})
@@ -93,11 +92,16 @@ export default function WishlistPage() {
             </div>
 
             {/* BUTTON */}
-            <div className="hidden md:flex items-center">
-              <button className="rounded-sm border bg-white px-6 py-3 text-black shadow transition hover:bg-[#DB4444] hover:text-white md:px-12">
-                Move All To Bag
-              </button>
-            </div>
+            {wishlistItems.length === 0 ? (
+              null
+            ) : (
+              <div className="hidden md:flex items-center">
+                <button className="rounded-sm border bg-white px-6 py-3 text-black shadow transition hover:bg-[#DB4444] hover:text-white md:px-12">
+                  Move All To Bag
+                </button>
+              </div>
+            )}
+            
 
           </header>
 
@@ -105,38 +109,68 @@ export default function WishlistPage() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 
             {wishlistItems.length === 0 ? (
-              <div className="col-span-full text-center py-10">
-                <p className="text-gray-500">Your wishlist is empty.</p>
+
+              <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
+  
+                {/* ICON */}
+                <div className="w-20 h-20 flex items-center justify-center rounded-full bg-gray-100 mb-5">
+                  <FaHeart className="text-3xl text-gray-500" />
+                </div>
+
+                {/* TITLE */}
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  Your wishlist is Empty
+                </h2>
+
+                {/* DESCRIPTION */}
+                <p className="text-gray-500 mt-2 max-w-sm">
+                  Save items you love to your wishlist and come back to them anytime.
+                  Start browsing and add your favorite products.
+                </p>
+
+                {/* BUTTON */}
+                <Link
+                  href="/"
+                  className="mt-6 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition"
+                >
+                  Explore Products
+                </Link>
+
               </div>
             ) : (
               wishlistItems.map((item) => (
                 <ProductCard
                   key={item.id}
                   product={item}
+                  isAdded={true}
+                  onRemove={() => {
+                    getWishlist()
+                  }}
                 />
               ))
             )}
 
-            {/* {wishlistItems.map((item) => (
-              <ProductCard
-                key={item.id}
-                product={item}
-              />
-            ))} */}
-
           </div>
 
             {/* MOBILE BUTTON */}
-            <div className="mt-8 flex justify-center md:hidden w-full">
+            {wishlistItems.length === 0 ? (
+              null
+            ) : (
+              <div className="mt-8 flex justify-center md:hidden w-full">
                 <button className="rounded-sm border bg-white px-6 py-3 text-black shadow transition hover:bg-[#DB4444] hover:text-white w-full">
                     Move All To Bag
                 </button>
-            </div>
+              </div>
+            )}
+            
 
         </section>
 
         {/* JUST FOR YOU SECTION */}
-        <section>
+        {wishlistItems.length === 0 ? (
+          null
+        ) : (
+          <section>
 
           {/* HEADER */}
           <header className="mb-10 flex w-full flex-row items-end justify-between px-4">
@@ -169,6 +203,7 @@ export default function WishlistPage() {
                 <ProductCard
                 key={item.id}
                 product={item}
+                isAdded={false}
                 />
             ))}
 
@@ -182,6 +217,8 @@ export default function WishlistPage() {
             </div>
 
         </section>
+        )}
+        
 
       </div>
     </main>
