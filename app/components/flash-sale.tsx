@@ -8,24 +8,18 @@ import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import ProductCard from "./product-card";
 import { Product } from "../types/product";
 import axios from "axios";
-import ProductCardSkeleton from "./skeletonUI/product-card-skeleton";
 import FlashSaleSkeleton from "./skeletonUI/flash-sale-skeleton";
+import Countdown from "./countdown";
 
 
 export default function FlashSale() {
-
-  
-
-  const [days, setDays] = useState("0");
-  const [hours, setHours] = useState("0");
-  const [minutes, setMinutes] = useState("0");
-  const [seconds, setSeconds] = useState("0");
 
   const [isLoading, setIsLoading] = useState(false)
 
   const [salesProducts, setSalesProducts] = useState<Product[]>([]);
 
   const saleEndDate = salesProducts?.[0]?.saleEndDate;
+
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
@@ -58,19 +52,33 @@ export default function FlashSale() {
     // emblaApi.plugins()?.autoplay?.play();
   }, [emblaApi, onSelect]);
 
+
   async function getFlashSales() {
     try {
-      setIsLoading(true)
-      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/flash-sales`)
-      console.log(data)
-      if(data.success){
+      setIsLoading(true);
+
+      const token = localStorage.getItem("userToken");
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/products/flash-sales`,
+        {
+          headers: token
+            ? {
+                Authorization: `Bearer ${token}`,
+              }
+            : {},
+        }
+      );
+
+      if (data.success) {
         setSalesProducts(data.data);
-      }else{
+      } else {
         setSalesProducts([]);
-      } 
-      setIsLoading(false)
+      }
     } catch (error) {
-      console.log(error)
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -78,46 +86,7 @@ export default function FlashSale() {
     getFlashSales();
   }, [])
 
-  useEffect(() => {
-    if (!salesProducts.length || !salesProducts[0].saleEndDate) return;
-
-    const endDate = new Date(salesProducts[0].saleEndDate);
-
-    const intervalId = setInterval(() => {
-      const now = new Date();
-      const diff = endDate.getTime() - now.getTime();
-
-      if (diff <= 0) {
-        clearInterval(intervalId);
-        setDays("00");
-        setHours("00");
-        setMinutes("00");
-        setSeconds("00");
-        return;
-      }
-
-      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = Math.floor(
-        (diff % (1000 * 60 * 60 * 24)) /
-          (1000 * 60 * 60)
-      );
-      const m = Math.floor(
-        (diff % (1000 * 60 * 60)) /
-          (1000 * 60)
-      );
-      const s = Math.floor(
-        (diff % (1000 * 60)) / 1000
-      );
-
-      setDays(String(d).padStart(2, "0"));
-      setHours(String(h).padStart(2, "0"));
-      setMinutes(String(m).padStart(2, "0"));
-      setSeconds(String(s).padStart(2, "0"));
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [salesProducts]);
-
+  
   if (isLoading) {
     return <FlashSaleSkeleton />;
   }
@@ -141,33 +110,8 @@ export default function FlashSale() {
             <div className="mt-2 flex items-center gap-12 md:gap-20">
               <h3 className="text-3xl font-semibold md:text-4xl">Flash Sales</h3>
 
-              <div className="flex items-center text-[#DB4444]">
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium text-black">Days</span>
-                  <span className="text-2xl font-bold text-black md:text-3xl">{days}</span>
-                </div>
+                {saleEndDate && <Countdown saleEndDate={saleEndDate} />}
 
-                <span className="mx-1 text-2xl md:mx-4 md:text-3xl">:</span>
-
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium text-black">Hours</span>
-                  <span className="text-2xl font-bold text-black md:text-3xl">{hours}</span>
-                </div>
-
-                <span className="mx-1 text-2xl md:mx-4 md:text-3xl">:</span>
-
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-black">Minutes</span>
-                  <span className="text-2xl font-bold text-black md:text-3xl">{minutes}</span>
-                </div>
-
-                <span className="mx-1 text-2xl md:mx-4 md:text-3xl">:</span>
-
-                <div className="flex flex-col items-center">
-                  <span className="text-sm font-medium text-black">Seconds</span>
-                  <span className="text-2xl font-bold text-black md:text-3xl">{seconds}</span>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -207,7 +151,7 @@ export default function FlashSale() {
           <div className="flex">
 
             {salesProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard isAdded={false} key={product.id} product={product} />
             ))}
 
           </div>

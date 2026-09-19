@@ -1,3 +1,5 @@
+import { BannerRequest, BannerRequestsResponse } from "@/app/types/banner-request";
+import { Order, OrdersResponse } from "@/app/types/orders-response";
 import { Product } from "@/app/types/product";
 import { ProductsResponse } from "@/app/types/products-response";
 import { UpdateVariantPayload, Variant } from "@/app/types/variant";
@@ -24,7 +26,8 @@ export const vendorsApi = createApi({
 
         headers.set(
             "authorization",
-            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzgxOTU4MTMxLCJleHAiOjE3ODI1NjI5MzF9.C0BzD9GYiD8bAaFsa6EXIhiyHpmgmzywE5hme1y-HOU`
+            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzg5NDEwODc5LCJleHAiOjE3OTAwMTU2Nzl9.CJDL2utPOBPqZuhTBCnMnKubP1FQyyXZM0NyU3CCskE`
+            // `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzg0NTcwMzI4LCJleHAiOjE3ODUxNzUxMjh9.axTPZo03URc285d_L1iFa97WtySW65N_yPhmwlSC3L8`
         );
 
         return headers;
@@ -34,8 +37,8 @@ export const vendorsApi = createApi({
     tagTypes: ["Vendors"],
   
     endpoints: (builder) => ({
-        getProducts: builder.query <ProductsResponse ,{ page?: number, limit?: number}> ({
-            query: ({ page, limit }) => `products?page=${page}&limit=${limit}`,
+        getProducts: builder.query <ProductsResponse ,{ page?: number, limit?: number, search?: string}> ({
+            query: ({ page, limit, search = "" }) => `products?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
             providesTags: ["Vendors"],
         }),
 
@@ -90,6 +93,35 @@ export const vendorsApi = createApi({
             invalidatesTags: ["Vendors"],
         }),
 
+        getOrders: builder.query <OrdersResponse ,{ page?: number, limit?: number, search: string}> ({
+            query: ({ page, limit, search = "" }) => `orders?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
+            providesTags: ["Vendors"],
+        }),
+
+        getSingleOrder: builder.query<{ success: Boolean, data:Order}, string>({
+            query: (id) => `orders/${id}`,
+            providesTags: ["Vendors"],
+        }),
+
+        createBannerRequest: builder.mutation< BannerRequest, { productId: string; icon?: string; offerPercentage?: number; note?: string;} >({
+            query: (data) => ({
+                url: "banner-requests/",
+                method: "POST",
+                body: data,
+        }),
+            invalidatesTags: ["Vendors"],
+        }),
+
+        getBannerReqHistory: builder.query <BannerRequestsResponse ,{ page?: number, limit?: number, search?: string}> ({
+            query: ({ page=1, limit=10, search = "" }) => `banner-requests/history?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
+            providesTags: ["Vendors"],
+        }),
+
+        getSingleBannerRequest: builder.query<{ success: Boolean, data: BannerRequest}, string>({
+            query: (id) => `banner-requests/history/${id}`,
+            providesTags: ["Vendors"],
+        }),
+
         
 
     }),
@@ -103,5 +135,10 @@ export const {
     useDeleteProductVariantMutation,
     useUpdateProductVariantMutation,
     useDeleteProductMutation,
+    useGetOrdersQuery,
+    useGetSingleOrderQuery,
+    useCreateBannerRequestMutation,
+    useGetBannerReqHistoryQuery,
+    useGetSingleBannerRequestQuery
     
 } = vendorsApi;

@@ -2,14 +2,16 @@
 
 import { getImageUrl } from '@/app/admin/utils/getImageUrl';
 import { useAddProductVariantMutation, useDeleteProductVariantMutation, useGetSingleProductQuery, useUpdateProductVariantMutation } from '@/app/redux/services/vendorsApi';
-import { Color, EditedVariant, Size, Variant } from '@/app/types/variant';
+import { Color, Size } from '@/app/types/variant';
 import { faImage, faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 import { faPlus, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import { useFormik } from 'formik';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+import { IoArrowForward } from "react-icons/io5";
 
 import { toast } from 'sonner';
 import * as Yup from "yup";
@@ -333,7 +335,7 @@ export default function page() {
 
             <form onSubmit={formik.handleSubmit}>
 
-                {/* Header */}
+                {/* Header
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold">
                         Edit Product
@@ -342,7 +344,26 @@ export default function page() {
                     <p className="mt-2 text-sm text-gray-500">
                         Edit Product And Manage Inventory.
                     </p>
-                </div>
+                </div> */}
+
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold">
+                            Edit Product
+                        </h1>
+
+                        <p className="mt-2 text-sm text-gray-500">
+                        Edit Product And Manage Inventory.
+                        </p>
+                    </div>
+
+                    <Link
+                        href="/vendor/products"
+                        className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm transition hover:bg-gray-100"
+                    >
+                        <IoArrowForward size={22} />
+                    </Link>
+                    </div>
 
 
                 {/* Fields */}

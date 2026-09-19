@@ -3,6 +3,7 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { User } from "../redux/services/adminsApi";
 import { jwtDecode } from "jwt-decode";
+import { socket } from "../admin/utils/socket";
 
 
 
@@ -38,6 +39,17 @@ export function AuthContextProvider({ children }: { children: ReactNode }){
             setLoading(false);
         }
     }, []);
+
+
+      useEffect(() => {
+            if (!loading && user) {
+            socket.connect();
+            }
+
+            return () => {
+            socket.disconnect();
+            };
+        }, [loading, user]);
 
     return(
         <authContext.Provider value={{user, setUser, loading}}>

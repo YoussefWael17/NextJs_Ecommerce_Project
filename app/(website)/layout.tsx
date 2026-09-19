@@ -1,7 +1,7 @@
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import Script from "next/script";
-import { Toaster } from "sonner";
+
 
 export default function WebsiteLayout({
   children,

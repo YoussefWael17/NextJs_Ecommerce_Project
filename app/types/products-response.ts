@@ -5,6 +5,14 @@ export interface Pagination {
     page: number,
     limit: number,
     totalPages: number,
+    pending: number,
+    paid: number,
+    shipped: number,
+    delivered: number,
+    cancelled: number,
+    availableProducts: number,
+    outOfStockProducts: number,
+    totalInventory: number
 }
 
 export interface ProductsResponse {

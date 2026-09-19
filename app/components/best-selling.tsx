@@ -15,8 +15,8 @@ export default function BestSelling() {
   async function getBestSellingProducts() {
     try {
       setIsLoading(true);
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/new-arrivals`)
-      // const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/best-sellers`)
+      // const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/new-arrivals`)
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/products/best-sellers`)
       console.log(res)
       setBestSellingProducts(res.data.data);
       setIsLoading(false)
@@ -165,7 +165,7 @@ export default function BestSelling() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {bestSellingProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} isAdded={isAdded} />
               ))}
             </div>
           )}

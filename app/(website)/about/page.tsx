@@ -1,9 +1,9 @@
-import React from 'react'
-import AboutSection from '../components/about-section'
-import Link from 'next/link'
-import StatsSection from '../components/stats-section'
-import TeamSection from '../components/team-section'
-import ServicesSection from '../components/services-section'
+import AboutSection from "@/app/components/about-section";
+import ServicesSection from "@/app/components/services-section";
+import StatsSection from "@/app/components/stats-section";
+import TeamSection from "@/app/components/team-section";
+import Link from "next/link";
+
 
 export default function AboutPage() {
   return (

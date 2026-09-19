@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { faBars, faXmark, faChartLine, faUsers, faCartShopping, faBoxOpen, faGear, faTableColumns, faBell, faTags } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faXmark, faChartLine, faUsers, faCartShopping, faBoxOpen, faGear, faTableColumns, faBell, faTags, faBullhorn } from "@fortawesome/free-solid-svg-icons";
 import { usePathname } from "next/navigation";
 import ProtectedRoute from "../components/protected-route";
 
@@ -65,6 +65,17 @@ export default function AdminLayout({
     },
 
     {
+      title: "Marketing",
+      links: [
+        {
+          href: "/admin/promotions",
+          label: "Promotions",
+          icon: faBullhorn,
+        }
+      ],
+    },
+
+    {
       title: "Settings",
       links: [
         {
@@ -74,6 +85,9 @@ export default function AdminLayout({
         },
       ],
     },
+
+    
+
   ];
 
   const isActive = (href: string) => {

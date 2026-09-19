@@ -3,13 +3,15 @@ import { adminsApi } from "./services/adminsApi";
 import { categoriesApi} from "./services/categoriesApi"
 import { vendorsApi } from "./services/vendorsApi";
 import { productsApi } from "./services/productsApi";
+import { heroBannersApi } from "./services/heroBannersApi";
 
 export const store = configureStore({
   reducer: {
     [adminsApi.reducerPath]: adminsApi.reducer,
     [categoriesApi.reducerPath]: categoriesApi.reducer,
     [vendorsApi.reducerPath]: vendorsApi.reducer,
-    [productsApi.reducerPath]: productsApi.reducer
+    [productsApi.reducerPath]: productsApi.reducer,
+    [heroBannersApi.reducerPath]: heroBannersApi.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -17,7 +19,8 @@ export const store = configureStore({
       adminsApi.middleware,
       categoriesApi.middleware,
       vendorsApi.middleware,
-      productsApi.middleware
+      productsApi.middleware,
+      heroBannersApi.middleware
     ),
 });
 

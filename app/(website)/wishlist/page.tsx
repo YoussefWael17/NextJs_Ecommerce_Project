@@ -9,6 +9,7 @@ import Link from "next/link";
 import { FaHeart } from "react-icons/fa";
 import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 
 export default function WishlistPage() {
 
@@ -17,27 +18,58 @@ export default function WishlistPage() {
   const [ isLoading, setIsLoading ] = useState(true);
   const [ error, setError ] = useState<string | null>(null);
     
+  // async function getWishlist() {
+  //   try {
+  //     setIsLoading(true);
+  //     setError(null);
+
+  //     if (!wishlist) return;
+
+  //     const res = await wishlist.getUserWishlist();
+
+  //     if (res?.data?.success) {
+  //       setWishlistItems(res.data.data);
+  //     } else{
+  //       setError("Failed To Load Wishlist");
+  //     }
+  //   } catch (error: any) {
+  //     console.error(error);
+  //     // setError("Something went wrong. Please try again.");
+  //     setError(error.response?.data?.message ?? "Something went wrong.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }
+
   async function getWishlist() {
-    try {
-      setIsLoading(true);
-      setError(null);
+  try {
+    setIsLoading(true);
+    setError(null);
 
-      if (!wishlist) return;
+    if (!wishlist) return;
 
-      const res = await wishlist.getUserWishlist();
+    const res = await wishlist.getUserWishlist();
 
-      if (res?.data?.success) {
-        setWishlistItems(res.data.data);
-      } else{
-        setError("Failed To Load Wishlist");
-      }
-    } catch (error) {
-      console.error(error);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (res.data.success) {
+      setWishlistItems(res.data.data);
     }
+  } catch (error: any) {
+    if (error.message === "No token found") {
+      setError("You need to sign in to view your wishlist.");
+    }
+    else if (axios.isAxiosError(error)) {
+      setError(
+        error.response?.data?.message ?? "Something went wrong."
+      );
+    } else {
+      setError("Something went wrong.");
+    }
+  } finally {
+    setIsLoading(false);
   }
+}
+
+  // console.count("WishlistPage Render");
 
   useEffect(()=>{
     getWishlist();
@@ -49,25 +81,34 @@ export default function WishlistPage() {
     );
   }
 
+
   if (error) {
     return (
-      <main className="container mx-auto py-10 md:h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center min-h-75 gap-4">
+      <main className="container mx-auto flex h-screen items-center justify-center">
+        <div className="flex min-h-75 flex-col items-center justify-center gap-4">
           <p className="text-gray-700">{error}</p>
 
-          <button
-            onClick={getWishlist}
-            className="flex items-center gap-2 border border-black rounded bg-black px-4 py-2 text-white cursor-pointer transition-all duration-300 hover:bg-white hover:text-black"
-          >
-            <FontAwesomeIcon
-              icon={faRotateRight}
-            />
-            Try Again
-          </button>
+          {error === "You need to log in to view your wishlist." ? (
+            <Link
+              href="/sign-in"
+              className="rounded-sm text-sm border border-[#DB4444] bg-[#DB4444] px-4 py-2 text-white shadow hover:bg-white hover:text-[#DB4444] transition duration-300"
+            >
+              Log In
+            </Link>
+          ) : (
+            <button
+              onClick={getWishlist}
+              className="flex items-center gap-2 rounded border border-black bg-black px-4 py-2 text-white transition-all duration-300 hover:bg-white hover:text-black"
+            >
+              <FontAwesomeIcon icon={faRotateRight} />
+              Try Again
+            </button>
+          )}
         </div>
       </main>
     );
   }
+
 
   return (
     <main className="flex min-h-screen w-full items-center py-10 mt-15 md:mt-15 mb-10">

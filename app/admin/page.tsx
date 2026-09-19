@@ -1,4 +1,21 @@
+"use client";
+
+import { useEffect } from "react";
+import { socket } from "./utils/socket";
+
+
 export default function AdminPage() {
+
+  useEffect(() => {
+    socket.on("new-banner-request", (data) => {
+      console.log("🔔", data);
+    });
+
+    return () => {
+      socket.off("new-banner-request");
+    };
+  }, []);
+
   return (
     <div>
 

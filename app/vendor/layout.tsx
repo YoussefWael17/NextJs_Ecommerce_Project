@@ -18,6 +18,7 @@ import {
   faPlus,
   faWallet,
   faUsers,
+  faBullhorn,
 } from "@fortawesome/free-solid-svg-icons";
 
 import ProtectedRoute from "../components/protected-route";
@@ -64,6 +65,22 @@ export default function VendorLayout({
         //   label: "Add Product",
         //   icon: faPlus,
         // },
+      ],
+    },
+
+    {
+      title: "Marketing",
+      links: [
+        {
+          href: "/vendor/banner-requests",
+          label: "Banner Requests",
+          icon: faBullhorn,
+        },
+        {
+          href: "/vendor/banner-requests/history",
+          label: "Banner Requests History",
+          icon: faBullhorn,
+        },
       ],
     },
 

@@ -1,3 +1,4 @@
+import { BannerRequestsResponse } from "@/app/types/banner-request";
 import { Category } from "@/app/types/category";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
@@ -118,7 +119,7 @@ export const adminsApi = createApi({
 
         headers.set(
             "authorization",
-            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZTI3ZjgwMy1hOTJmLTRkMTQtOWQxOC04MTc4YzBjMDAxZmQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODIwNjU0NzUsImV4cCI6MTc4MjY3MDI3NX0.oeAg6aMWs-9g7l8KCQJ43BtmQap6GQAUfAZ6knQ5kgE`
+            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZTI3ZjgwMy1hOTJmLTRkMTQtOWQxOC04MTc4YzBjMDAxZmQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODY5ODgwNzksImV4cCI6MTc4NzU5Mjg3OX0.c40gnU7mW9W-1-vRmTeybharCRR_dP_JCj7vxL5XlCY`
         );
 
         return headers;
@@ -208,8 +209,12 @@ export const adminsApi = createApi({
         invalidatesTags: ["Admins"],
     }),
 
-    
+    getBannerRequests: builder.query<BannerRequestsResponse, { page?: number, limit?: number, search: string}>({
+        query: ({ page, limit, search = "" }) => `banner-requests?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
+        providesTags: ["Admins"],
+    }),
 
+      
     
 
   }),
@@ -225,4 +230,5 @@ export const {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
+  useGetBannerRequestsQuery
 } = adminsApi;

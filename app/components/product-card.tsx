@@ -5,33 +5,40 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "sonner";
 import { getImageUrl } from "../admin/utils/getImageUrl";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { ProductCardUI } from "../types/product";
 import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { memo, useContext, useEffect, useState } from "react";
 import { cartContext } from "../context/cartContext";
 import { wishlistContext } from "../context/wishlistContext";
+import { Variant } from "../types/variant";
+import ProductCardProps from "../types/product-card";
 
 
-interface ProductCardProps {
-  product: ProductCardUI;
-  isAdded: boolean,
-  onRemove?: () => void;
-}
+// export default function  ProductCard({product, isAdded, onRemove}: ProductCardProps) 
+const ProductCard = memo(function ProductCard({
+  product,
+  isAdded,
+  onRemove,
+}: ProductCardProps)
+{
 
-
-export default function ProductCard({product, isAdded, onRemove}: ProductCardProps) {
-
+  // State Management + Using Hooks + Context
   const router = useRouter();
-  const cart = useContext(cartContext)
+  const cart = useContext(cartContext);
   const wishlist = useContext(wishlistContext);
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
 
-  // const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  // Declare Variables  
+  const variants = product.variants;
+  const prices = product.variants?.map(v => v.price) ?? [];
+  const maxPrice = prices.length ? Math.max(...prices) : 0;
+
   
+  const isOffered = true;
+
+  // Add To Cart, Add To Wishlist, Remove From Wishlist And Navigate To Product Details
   function navigateToProductDetails(id: string) {
     return router.push(`/products/${id}`)
   }
-
-  
 
   async function addVaraintToCart(varId: string, quantity: number) {
       try {
@@ -47,48 +54,50 @@ export default function ProductCard({product, isAdded, onRemove}: ProductCardPro
       } catch (error) {
         console.log(error)
       }
-    }
+  }
 
-    async function addVaraintToWishlist(varId: string) {
+  async function addVaraintToWishlist(varId: string) {
+    try {
+      if (!cart) return;
+
+      const res = await wishlist?.addItemToWishlist(varId);
+
+      console.log(res)
+
+      if(res.data.success === true){
+        toast.success("Product Added To Wishlist Successfully")
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function removeWishlistItem(wishlistItemId: string) {
       try {
-        if (!cart) return;
+        if (!wishlist) return;
   
-        const res = await wishlist?.addItemToWishlist(varId);
+        const res = await wishlist?.removeWishlistItem(wishlistItemId);
   
         console.log(res)
   
         if(res.data.success === true){
-          toast.success("Product Added To Wishlist Successfully")
+          toast.success("Item Removed Successfully")
+          onRemove?.();
         }
+        
       } catch (error) {
         console.log(error)
       }
+      
+  }
+    
+  useEffect(() => {
+    if (variants?.length) {
+      setSelectedVariant(variants[0]);
     }
+  }, [variants]);
 
-    async function removeWishlistItem(wishlistItemId: string) {
-        try {
-          if (!wishlist) return;
-    
-          const res = await wishlist?.removeWishlistItem(wishlistItemId);
-    
-          console.log(res)
-    
-          if(res.data.success === true){
-            toast.success("Item Removed Successfully")
-            onRemove?.();
-          }
-          
-        } catch (error) {
-          console.log(error)
-        }
-        
-      }
   
-  const isOffered = true;
-  // const isAdded = false;
-
-  const prices = product.variants?.map(v => v.price) ?? [];
-  const maxPrice = prices.length ? Math.max(...prices) : 0;
 
   return (
     <div className="flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_33.333%] lg:flex-[0_0_25%]">
@@ -135,25 +144,11 @@ export default function ProductCard({product, isAdded, onRemove}: ProductCardPro
                 </button>
               )}
 
-              <button className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition">
+              <button 
+              onClick={()=> {navigateToProductDetails(product.id)}}
+              className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition">
                 <FontAwesomeIcon icon={faEye} />
               </button>
-
-              {/* {isAdded && (
-                <button
-                  onClick={() => {
-                    if (!product.variants?.id) {
-                  toast.error("Product is unavailable");
-                  return;
-                    }
-                    removeWishlistItem(product.variants?.id)
-                  }
-                    // toast.error("Product Removed From Wishlist")
-                  }
-                  className="rounded-full bg-white shadow w-8 h-8 flex justify-center items-center cursor-pointer hover:bg-gray-100 transition">
-                    <FontAwesomeIcon icon={faTrashCan} />
-                </button>
-              )} */}
 
               {isAdded && (
                 <button
@@ -183,7 +178,8 @@ export default function ProductCard({product, isAdded, onRemove}: ProductCardPro
                   toast.error("Product is unavailable");
                   return;
                 }
-                addVaraintToCart(product.variants?.[0]?.id, 1);
+                // addVaraintToCart(product.variants?.[0]?.id, 1);
+                addVaraintToCart(selectedVariant!.id, 1);
                 
               }
                 
@@ -207,7 +203,7 @@ export default function ProductCard({product, isAdded, onRemove}: ProductCardPro
           </div>
 
           {/* CONTENT */}
-          <div className="p-4 cursor-pointer" onClick={()=> {navigateToProductDetails(product.id)}}>
+          <div className="p-4 cursor-pointer">
 
             <h3 className="text-lg font-bold">
               {product.title}
@@ -217,20 +213,32 @@ export default function ProductCard({product, isAdded, onRemove}: ProductCardPro
               {product.category.name}
             </p>
 
-            <div className="mt-2 flex items-center gap-2">
 
-              <span className="font-bold text-red-500">
-                ${maxPrice}
-              </span>
+            {isOffered && product.salePercentage != null ? (
+              <div className="mt-2 flex items-center gap-2">
 
-
-              {isOffered && (
-                <span className="text-sm text-gray-400 line-through">
-                  ${product.salePercentage}
+                <span className="font-bold text-red-500">
+                  $
+                    {(
+                      maxPrice *
+                      (1 - product.salePercentage / 100)
+                    ).toFixed(2)}
                 </span>
-              )}
 
-            </div>
+                <span className="text-sm text-gray-400 line-through">
+                  ${maxPrice}
+                </span>
+              
+              </div>
+            ) :
+              <div className="mt-2 flex items-center gap-2">
+
+                <span className="font-bold text-red-500">
+                  ${maxPrice}
+                </span>
+              
+              </div>
+            }
 
             <div className="mt-2 flex items-center gap-2">
     
@@ -253,6 +261,31 @@ export default function ProductCard({product, isAdded, onRemove}: ProductCardPro
               </span>
             </div>
 
+            <div className="mt-2 flex items-center gap-2">
+    
+
+              
+
+              <div className="flex items-center gap-2">
+                {variants?.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      setSelectedVariant(item)
+                      console.log(selectedVariant)
+                    }}
+                    className={`h-3.5 w-3.5 cursor-pointer rounded-full border ${
+                      selectedVariant?.id === item.id
+                        ? "ring-2 ring-black ring-offset-2"
+                        : "border-gray-400"
+                    }`}
+                    style={{ backgroundColor: item.color?.hexCode || item.color?.name as string }}
+                  />
+                ))}
+              </div>
+
+            </div>
+
           </div>
 
         </div>
@@ -261,4 +294,7 @@ export default function ProductCard({product, isAdded, onRemove}: ProductCardPro
 
     </div>
   );
-}
+})
+
+
+export default ProductCard;

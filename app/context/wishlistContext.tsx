@@ -28,14 +28,24 @@ export function WishlistContextProvider({ children }: { children: ReactNode }){
     }
 
     function getUserWishlist(){
+
+        const token = localStorage.getItem("userToken");
+
+        if (!token) {
+            return Promise.reject({
+                status: 401,
+                message: "No token found",
+            });
+        }
+
         return axios.get(`${process.env.NEXT_PUBLIC_API_URL}/wishlist`,
             {
                 headers: {
-                    Authorization : `Bearer ${localStorage.getItem("userToken")}`
+                    Authorization: `Bearer ${token}`
                 }
             }
         ).then((res)=> res)
-        .catch((err)=> err)
+        .catch((err)=> {throw (err)})
     }
 
 
