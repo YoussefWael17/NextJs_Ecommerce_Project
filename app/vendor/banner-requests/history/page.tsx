@@ -19,9 +19,12 @@ import {
 import BannerRequestsHistory from "../banner-requests-history";
 
 import {
+  useDeleteSingleBannerRequestMutation,
   useGetBannerReqHistoryQuery,
 } from "@/app/redux/services/vendorsApi";
 import VendorBannerRequestsPageSkeleton from "@/app/components/skeletonUI/vendor-banner-requests-history-skeleton";
+import { toast } from "sonner";
+import { BannerRequest } from "@/app/types/banner-request";
 
 
 export default function BannerRequestsHistoryPage() {
@@ -66,6 +69,8 @@ export default function BannerRequestsHistoryPage() {
     limit: 10,
     search: debouncedSearch,
   });
+
+  const [ deleteSingleRequestBanner ] = useDeleteSingleBannerRequestMutation()
 
   /* ================================================================
      Data
@@ -118,11 +123,23 @@ export default function BannerRequestsHistoryPage() {
     return () => clearTimeout(timer);
   }, [search]);
 
+
+  const handleDeleteBannerRequest = async (request: BannerRequest) => {
+    try {
+      await deleteSingleRequestBanner(request.id).unwrap();
+
+      toast.success("Banner Request deleted successfully");
+      refetch();
+    } catch (error) {
+      toast.error("Failed to Delete Banner Request");
+    }
+  };
+
   /* ================================================================
      Loading
   ================================================================ */
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return <VendorBannerRequestsPageSkeleton />;
   }
 
@@ -349,6 +366,7 @@ export default function BannerRequestsHistoryPage() {
             <BannerRequestsHistory
               requests={requests}
               isLoading={false}
+              onDelete={handleDeleteBannerRequest}
             />
 
 

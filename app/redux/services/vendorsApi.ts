@@ -26,7 +26,7 @@ export const vendorsApi = createApi({
 
         headers.set(
             "authorization",
-            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzg5NDEwODc5LCJleHAiOjE3OTAwMTU2Nzl9.CJDL2utPOBPqZuhTBCnMnKubP1FQyyXZM0NyU3CCskE`
+            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzkwMDE2MjEyLCJleHAiOjE3OTA2MjEwMTJ9.oEyCJ5RNKL3SAYpN_CDIgqP5RMDN8frwXUlqAIgokbI`
             // `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzg0NTcwMzI4LCJleHAiOjE3ODUxNzUxMjh9.axTPZo03URc285d_L1iFa97WtySW65N_yPhmwlSC3L8`
         );
 
@@ -122,6 +122,15 @@ export const vendorsApi = createApi({
             providesTags: ["Vendors"],
         }),
 
+        deleteSingleBannerRequest: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `banner-requests/history/${id}`,
+                method: "DELETE",
+            }),
+
+            invalidatesTags: ["Vendors"],
+        }),
+
         
 
     }),
@@ -139,6 +148,7 @@ export const {
     useGetSingleOrderQuery,
     useCreateBannerRequestMutation,
     useGetBannerReqHistoryQuery,
-    useGetSingleBannerRequestQuery
+    useGetSingleBannerRequestQuery,
+    useDeleteSingleBannerRequestMutation
     
 } = vendorsApi;

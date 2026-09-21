@@ -875,7 +875,7 @@ export default function ViewBannerRequestPage() {
       case "PENDING":
         return {
           wrapper:
-            "border-orange-100 bg-orange-50 text-orange-600",
+            "border-orange-100 bg-yellow-50 text-yellow-600",
           dot: "bg-orange-500",
         };
 

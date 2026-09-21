@@ -20,6 +20,7 @@ import { getImageUrl } from "@/app/admin/utils/getImageUrl";
 
 import type { BannerRequest } from "@/app/types/banner-request";
 
+
 interface BannerRequestsHistoryProps {
   requests: BannerRequest[];
   isLoading?: boolean;
@@ -31,6 +32,9 @@ export default function BannerRequestsHistory({
   isLoading = false,
   onDelete,
 }: BannerRequestsHistoryProps) {
+
+
+
   /* ================================================================
      Loading
   ================================================================ */
@@ -255,7 +259,7 @@ export default function BannerRequestsHistory({
                             type="button"
                             // onClick={() => onEdit?.(request)}
                             onClick={() => {navigateToViewBannerRequest(request.id)}}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 cursor-pointer"
                             title="Edit request"
                           >
                             <FontAwesomeIcon
@@ -269,7 +273,7 @@ export default function BannerRequestsHistory({
                           <button
                             type="button"
                             onClick={() => onDelete?.(request)}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600 cursor-pointer"
                             title="Delete request"
                           >
                             <FontAwesomeIcon
