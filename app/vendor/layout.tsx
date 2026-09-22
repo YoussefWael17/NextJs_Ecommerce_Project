@@ -78,7 +78,7 @@ export default function VendorLayout({
         },
         {
           href: "/vendor/banner-requests/history",
-          label: "Banner Requests History",
+          label: "Requests History",
           icon: faBullhorn,
         },
       ],
@@ -129,12 +129,23 @@ export default function VendorLayout({
     },
   ];
 
+
   const isActive = (href: string) => {
     if (href === "/vendor") {
       return pathname === "/vendor";
     }
 
-    return pathname.startsWith(href);
+    const matchingLinks = sections
+      .flatMap((section) => section.links)
+      .filter((link) => {
+        return (
+          pathname === link.href ||
+          pathname.startsWith(`${link.href}/`)
+        );
+      })
+      .sort((a, b) => b.href.length - a.href.length);
+
+    return matchingLinks[0]?.href === href;
   };
 
   return (

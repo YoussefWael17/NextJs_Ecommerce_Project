@@ -1,4 +1,4 @@
-import { BannerRequestsResponse } from "@/app/types/banner-request";
+import { BannerRequest, BannerRequestsResponse } from "@/app/types/banner-request";
 import { Category } from "@/app/types/category";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
@@ -119,7 +119,7 @@ export const adminsApi = createApi({
 
         headers.set(
             "authorization",
-            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZTI3ZjgwMy1hOTJmLTRkMTQtOWQxOC04MTc4YzBjMDAxZmQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODY5ODgwNzksImV4cCI6MTc4NzU5Mjg3OX0.c40gnU7mW9W-1-vRmTeybharCRR_dP_JCj7vxL5XlCY`
+            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkZTI3ZjgwMy1hOTJmLTRkMTQtOWQxOC04MTc4YzBjMDAxZmQiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3OTAwOTk1ODksImV4cCI6MTc5MDcwNDM4OX0.ECzvIDxsDyjOTQJXFAK7LlTiQteo8Or71gvvkRBU-lI`
         );
 
         return headers;
@@ -214,6 +214,24 @@ export const adminsApi = createApi({
         providesTags: ["Admins"],
     }),
 
+    approveBannerRequest: builder.mutation<void, string >({
+      query: ( id ) => ({
+        url: `banner-requests/${id}/approve`,
+        method: "PATCH",
+      }),
+
+      invalidatesTags: ["Admins"],
+    }),
+
+    rejectBannerRequest: builder.mutation<void, string >({
+      query: ( id ) => ({
+        url: `banner-requests/${id}/reject`,
+        method: "PATCH",
+      }),
+
+      invalidatesTags: ["Admins"],
+    }),
+
       
     
 
@@ -230,5 +248,9 @@ export const {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
-  useGetBannerRequestsQuery
+  useGetBannerRequestsQuery,
+  useApproveBannerRequestMutation,
+  useRejectBannerRequestMutation
+
+  
 } = adminsApi;
