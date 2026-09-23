@@ -81,6 +81,12 @@ export default function VendorLayout({
           label: "Requests History",
           icon: faBullhorn,
         },
+
+        {
+          href: "/vendor/promo-banner-requests",
+          label: "Promo Requests",
+          icon: faBullhorn,
+        },
       ],
     },
 

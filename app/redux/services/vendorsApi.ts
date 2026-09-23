@@ -2,6 +2,7 @@ import { BannerRequest, BannerRequestsResponse } from "@/app/types/banner-reques
 import { Order, OrdersResponse } from "@/app/types/orders-response";
 import { Product } from "@/app/types/product";
 import { ProductsResponse } from "@/app/types/products-response";
+import { PromoBannerRequest } from "@/app/types/promo-banner-request";
 import { UpdateVariantPayload, Variant } from "@/app/types/variant";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
@@ -131,6 +132,23 @@ export const vendorsApi = createApi({
             invalidatesTags: ["Vendors"],
         }),
 
+        createPromoBannerRequest: builder.mutation< PromoBannerRequest,
+            {
+                productId: string;
+                offerPercentage: number;
+                startDate: string;
+                endDate: string;
+                backgroundColor: string;
+                note?: string;
+            }>({
+            query: (data) => ({
+                url: "promo-banner-requests",
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["Vendors"],
+            }),
+
         
 
     }),
@@ -149,6 +167,8 @@ export const {
     useCreateBannerRequestMutation,
     useGetBannerReqHistoryQuery,
     useGetSingleBannerRequestQuery,
-    useDeleteSingleBannerRequestMutation
+    useDeleteSingleBannerRequestMutation,
+
+    useCreatePromoBannerRequestMutation
     
 } = vendorsApi;
