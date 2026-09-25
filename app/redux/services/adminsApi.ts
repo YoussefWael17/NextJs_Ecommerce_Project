@@ -1,5 +1,6 @@
-import { BannerRequest, BannerRequestsResponse } from "@/app/types/banner-request";
+import { BannerRequestsResponse } from "@/app/types/banner-request";
 import { Category } from "@/app/types/category";
+import { PromoBannerRequestsResponse } from "@/app/types/promo-banner-request";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 
@@ -232,6 +233,29 @@ export const adminsApi = createApi({
       invalidatesTags: ["Admins"],
     }),
 
+    getPromoBannerRequests: builder.query<PromoBannerRequestsResponse, { page?: number, limit?: number, search: string}>({
+      query: ({ page, limit, search = "" }) => `promo-banner-requests?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`,
+      providesTags: ["Admins"],
+    }),
+
+    approvePromoBannerRequest: builder.mutation<void, string >({
+      query: ( id ) => ({
+        url: `promo-banner-requests/${id}/approve`,
+        method: "PATCH",
+      }),
+
+      invalidatesTags: ["Admins"],
+    }),
+
+    rejectPromoBannerRequest: builder.mutation<void, string >({
+      query: ( id ) => ({
+        url: `promo-banner-requests/${id}/reject`,
+        method: "PATCH",
+      }),
+
+      invalidatesTags: ["Admins"],
+    }),
+
       
     
 
@@ -250,7 +274,11 @@ export const {
   useDeleteCategoryMutation,
   useGetBannerRequestsQuery,
   useApproveBannerRequestMutation,
-  useRejectBannerRequestMutation
+  useRejectBannerRequestMutation,
+
+  useGetPromoBannerRequestsQuery,
+  useApprovePromoBannerRequestMutation,
+  useRejectPromoBannerRequestMutation
 
   
 } = adminsApi;

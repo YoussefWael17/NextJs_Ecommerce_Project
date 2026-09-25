@@ -1,15 +1,15 @@
 "use client";
 
-import { useApproveBannerRequestMutation, useGetBannerRequestsQuery, useRejectBannerRequestMutation } from "@/app/redux/services/adminsApi";
-import { faTags, faPercent, faCalendarDays, faCircleCheck, faClock, faBan, faPlus, faMagnifyingGlass, faEllipsisVertical, faCheck, faXmark, faBullhorn, faBoxOpen, faRotateRight, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { useApprovePromoBannerRequestMutation, useGetPromoBannerRequestsQuery, useRejectPromoBannerRequestMutation } from "@/app/redux/services/adminsApi";
+import { faCircleCheck, faClock, faMagnifyingGlass, faXmark, faBullhorn, faBoxOpen, faRotateRight, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import VendorBannerRequestsPageSkeleton from "@/app/components/skeletonUI/vendor-banner-requests-history-skeleton";
-import { BannerRequest } from "@/app/types/banner-request";
 import { toast } from "sonner";
-import BannerRequestsHistoryAdmin from "@/app/components/admin-components/banner-reqs-history-admin";
+import PromoBannerRequestsHistoryAdmin from "@/app/components/admin-components/promo-banner-reqs-history-admin";
+import { PromoBannerRequest } from "@/app/types/promo-banner-request";
 
-export default function AdminPromotionsPage() {
+export default function AdminPromoBannersPage() {
   
 
   // Search State & Page State 
@@ -18,12 +18,12 @@ export default function AdminPromotionsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   
   // Using RTK For Admin Banner Requests
-  const { data, refetch, isLoading, isFetching, isError} = useGetBannerRequestsQuery({page, limit:5, search: debouncedSearch});
-  const [ approveRequestBanner ] = useApproveBannerRequestMutation()
-  const [ rejectRequestBanner ] = useRejectBannerRequestMutation()
+  const { data, refetch, isLoading, isFetching, isError} = useGetPromoBannerRequestsQuery({page, limit:5, search: debouncedSearch});
+  const [ approvePromoRequestBanner ] = useApprovePromoBannerRequestMutation()
+  const [ rejectPromoRequestBanner ] = useRejectPromoBannerRequestMutation()
   
   // Variables Declarations
-  const banners = data?.data?.bannerRequests ?? [];
+  const banners = data?.data?.promoBannerRequests ?? [];
   const pagination = data?.data?.pagination;    
   const totalPages = pagination?.totalPages || 1;
   const totalBanners = pagination?.total ?? 0;
@@ -51,23 +51,23 @@ export default function AdminPromotionsPage() {
       return () => clearTimeout(timer);
   }, [search]);
 
-  async function handleApprove(request: BannerRequest) {
+  async function handleApprove(request: PromoBannerRequest) {
     try {
-      await approveRequestBanner(request.id).unwrap();
-      toast.success("Banner Request Approved Successfully");
+      await approvePromoRequestBanner(request.id).unwrap();
+      toast.success("Promo Banner Request Approved Successfully");
       refetch();
     } catch (error) {
-      toast.error("Failed to Approve Banner Request");
+      toast.error("Failed to Approve Promo Banner Request");
     }
   }
 
-  async function handleReject(request: BannerRequest) {
+  async function handleReject(request: PromoBannerRequest) {
     try {
-      await rejectRequestBanner(request.id).unwrap();
-      toast.success("Banner Request Rejected Successfully");
+      await rejectPromoRequestBanner(request.id).unwrap();
+      toast.success("Promo Banner Request Rejected Successfully");
       refetch();
     } catch (error) {
-      toast.error("Failed to Reject Banner Request");
+      toast.error("Failed to Reject Promo Banner Request");
     }
   }
 
@@ -98,11 +98,11 @@ export default function AdminPromotionsPage() {
           </div>
 
           <h2 className="mt-6 text-2xl font-bold text-gray-900">
-            Failed to load banner requests
+            Failed to load promo banner requests
           </h2>
 
           <p className="mt-2 text-sm leading-6 text-gray-500">
-            We couldn't retrieve your banner requests right now.
+            We couldn't retrieve your promo banner requests right now.
             Please check your connection and try again.
           </p>
 
@@ -137,11 +137,11 @@ export default function AdminPromotionsPage() {
 
             <div>
               <h1 className="text-2xl font-bold text-black sm:text-3xl">
-                Promotions Management
+                Promo Banners Management
               </h1>
 
               <p className="mt-2 text-sm text-gray-500">
-                Manage promotional campaigns across your marketplace.
+                Manage promo banners campaigns across your marketplace.
               </p>
             </div>
 
@@ -157,18 +157,18 @@ export default function AdminPromotionsPage() {
         
         {/* Total */}
 
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-gray-200 bg-white p-5 shadow-sm md:items-start">
+        <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
 
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-[#DB4444]">
             <FontAwesomeIcon icon={faBullhorn} />
           </div>
 
           <h3 className="text-2xl font-bold">
-            {totalBanners || "total requests"}
+            {totalBanners}
           </h3>
 
           <p className="mt-1 text-sm text-gray-500">
-            Total Requests
+            Total Promo Requests
           </p>
 
         </div>
@@ -203,8 +203,7 @@ export default function AdminPromotionsPage() {
 
         {/* Rejected */}
 
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-gray-200 bg-white p-5 shadow-sm md:items-start">
-
+        <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
             <FontAwesomeIcon icon={faXmark} />
           </div>
@@ -237,11 +236,11 @@ export default function AdminPromotionsPage() {
           <div>
 
             <h2 className="text-xl font-bold text-black sm:text-2xl">
-              Requests List
+              Promo Banners Requests List
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
-              Manage and track your banner requests.
+              Manage and track your promo banner requests.
             </p>
 
           </div>
@@ -286,8 +285,8 @@ export default function AdminPromotionsPage() {
 
           <div>
 
-            <BannerRequestsHistoryAdmin
-              requests={banners}
+            <PromoBannerRequestsHistoryAdmin
+              promoBannerRequests={banners}
               isLoading={false}
               onApprove={handleApprove}
               onReject={handleReject}
@@ -383,12 +382,12 @@ export default function AdminPromotionsPage() {
 
 
             <h3 className="text-xl font-semibold text-gray-900">
-              No Banner Requests Found
+              No Promo Banner Requests Found
             </h3>
 
 
             <p className="mt-2 max-w-md text-sm text-gray-500">
-              There are no banner requests to display at the moment.
+              There are no promo banner requests to display at the moment.
 
               {debouncedSearch &&
                 " Try adjusting your search or clear the search term."}
@@ -420,12 +419,5 @@ export default function AdminPromotionsPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
 
 

@@ -24,10 +24,30 @@ export type PromoBannerRequest = {
   createdAt: string;
   updatedAt: string;
 
-  product?: Product;
+  product: Product;
   vendor?: {
     id: string;
     name: string | null;
     email: string;
   };
 };
+
+
+export interface PromoBannerRequestsResponse {
+  success: boolean;
+  data: {
+    promoBannerRequests: PromoBannerRequest[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+      pending: number;
+      approved: number;
+      rejected: number;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean
+    };
+  };
+}
+

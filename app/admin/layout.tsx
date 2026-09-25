@@ -71,6 +71,11 @@ export default function AdminLayout({
           href: "/admin/promotions",
           label: "Promotions",
           icon: faBullhorn,
+        },
+        {
+          href: "/admin/promo-banners",
+          label: "Promo Banners",
+          icon: faBullhorn,
         }
       ],
     },
