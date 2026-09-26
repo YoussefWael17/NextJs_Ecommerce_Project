@@ -4,6 +4,7 @@ import { categoriesApi} from "./services/categoriesApi"
 import { vendorsApi } from "./services/vendorsApi";
 import { productsApi } from "./services/productsApi";
 import { heroBannersApi } from "./services/heroBannersApi";
+import { promoBannerApi } from "./services/promoBannerApi";
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
     [categoriesApi.reducerPath]: categoriesApi.reducer,
     [vendorsApi.reducerPath]: vendorsApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
-    [heroBannersApi.reducerPath]: heroBannersApi.reducer
+    [heroBannersApi.reducerPath]: heroBannersApi.reducer,
+    [promoBannerApi.reducerPath]: promoBannerApi.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -20,7 +22,8 @@ export const store = configureStore({
       categoriesApi.middleware,
       vendorsApi.middleware,
       productsApi.middleware,
-      heroBannersApi.middleware
+      heroBannersApi.middleware,
+      promoBannerApi.middleware
     ),
 });
 
