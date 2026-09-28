@@ -19,6 +19,8 @@ import {
   faWallet,
   faUsers,
   faBullhorn,
+  faPercent,
+  faClockRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 
 import ProtectedRoute from "../components/protected-route";
@@ -79,13 +81,13 @@ export default function VendorLayout({
         {
           href: "/vendor/banner-requests/history",
           label: "Requests History",
-          icon: faBullhorn,
+          icon: faClockRotateLeft,
         },
 
         {
           href: "/vendor/promo-banner-requests",
           label: "Promo Requests",
-          icon: faBullhorn,
+          icon: faPercent,
         },
       ],
     },

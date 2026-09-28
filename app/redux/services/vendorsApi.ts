@@ -27,7 +27,7 @@ export const vendorsApi = createApi({
 
         headers.set(
             "authorization",
-            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzkwMDE2MjEyLCJleHAiOjE3OTA2MjEwMTJ9.oEyCJ5RNKL3SAYpN_CDIgqP5RMDN8frwXUlqAIgokbI`
+            `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzkwNjIyMTQyLCJleHAiOjE3OTEyMjY5NDJ9.CfhpobjuskIO7Lu5b1y9ScQ_M7EUzutR9ACkJAm5GeQ`
             // `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyYmM2OWNkMi02N2QwLTQ0ODktYmMyZS03NDI1YTg3MjY4NTMiLCJyb2xlIjoiVkVORE9SIiwiaWF0IjoxNzg0NTcwMzI4LCJleHAiOjE3ODUxNzUxMjh9.axTPZo03URc285d_L1iFa97WtySW65N_yPhmwlSC3L8`
         );
 
@@ -149,6 +149,14 @@ export const vendorsApi = createApi({
             invalidatesTags: ["Vendors"],
             }),
 
+            getVendorAnalytics: builder.query<VendorAnalyticsResponse, void>({
+                query: () => ({
+                    url: "/analytices",
+                    method: "GET",
+                }),
+
+                providesTags: ["Vendors"],
+            }),
         
 
     }),
@@ -169,6 +177,8 @@ export const {
     useGetSingleBannerRequestQuery,
     useDeleteSingleBannerRequestMutation,
 
-    useCreatePromoBannerRequestMutation
+    useCreatePromoBannerRequestMutation,
+
+    useGetVendorAnalyticsQuery
     
 } = vendorsApi;

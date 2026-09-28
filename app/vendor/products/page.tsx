@@ -36,7 +36,7 @@ export default function VendorProductsPage() {
     const [ selectedProductId, setSelectedProductId ] = useState<string | null>(null);
 
     // Using RTK For Vendor Products
-    const { data, refetch, isLoading, isFetching, isError} = useGetProductsQuery({page, limit:5, search: debouncedSearch});
+    const { data, refetch, isLoading, isFetching, isError} = useGetProductsQuery({page, limit:5});
     const [deleteProduct] = useDeleteProductMutation();
 
     const products = data?.data?.products ?? [];
@@ -47,6 +47,14 @@ export default function VendorProductsPage() {
     const outOfStockProducts = pagination?.outOfStockProducts ?? 0;
     const totalInventory = pagination?.totalInventory ?? 0;
     
+    console.log(data)
+
+    useEffect(() => {
+      if (pagination?.totalPages && page > pagination.totalPages) {
+        setPage(pagination.totalPages);
+      }
+    }, [page, pagination?.totalPages]);
+
     // Show First & Last pages And The Current Page & Its Adjacent Pages
     const visiblePages = Array.from({ length: totalPages },(_, i) => i + 1)
     .filter((p) =>
@@ -275,18 +283,17 @@ export default function VendorProductsPage() {
           // {/* Products Section (Products > 0) */} 
           <div>
 
-            {/* Products Section Data Table Desktop */} 
-            <div className="hidden overflow-x-auto lg:block">
-              
-              <table className="min-w-full border-separate border-spacing-y-3">
+            {/* Products Section Data Table Desktop */}
+            {/* <div className="hidden overflow-x-auto lg:block">
+              <table className="w-full border-separate border-spacing-y-3">
                 <thead>
                   <tr className="text-left text-sm text-gray-400">
-                    <th className="px-4">Product</th>
-                    <th className="px-4">Category</th>
-                    <th className="px-4">Price</th>
-                    <th className="px-4">Stock</th>
-                    <th className="px-4">Status</th>
-                    <th className="px-4">Actions</th>
+                    <th className="px-4 pb-2 font-medium">Product</th>
+                    <th className="px-4 pb-2 font-medium">Category</th>
+                    <th className="px-4 pb-2 font-medium">Price</th>
+                    <th className="px-4 pb-2 font-medium">Stock</th>
+                    <th className="px-4 pb-2 font-medium">Status</th>
+                    <th className="px-4 pb-2 font-medium">Actions</th>
                   </tr>
                 </thead>
 
@@ -294,68 +301,74 @@ export default function VendorProductsPage() {
                   {products.map((product) => (
                     <tr
                       key={product.id}
-                      className="bg-gray-50"
+                      className="bg-gray-50 transition-colors hover:bg-gray-100"
                     >
                       <td className="rounded-l-2xl px-4 py-4">
                         <div className="flex items-center gap-3">
-                
-                          <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-gray-200">
+                          <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-gray-200 bg-white">
                             <Image
                               src={getImageUrl(product.thumbnail)}
                               alt={product.title}
                               fill
+                              sizes="48px"
                               className="object-cover"
                               unoptimized
                             />
                           </div>
 
                           <div>
-                            <h3 className="font-semibold">
+                            <h3 className="font-semibold text-gray-900">
                               {product.title}
                             </h3>
 
-                            <p className="text-sm text-gray-500">
+                            <p className="mt-1 text-sm text-gray-500">
                               {formatDate(product.createdAt)}
                             </p>
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 text-sm text-gray-700">
                         {product.category?.name}
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 text-sm font-medium text-gray-900">
                         ${product.variants?.[0]?.price}
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 text-sm text-gray-700">
                         {product.variants?.[0]?.stock}
                       </td>
 
                       <td className="px-4 py-4">
                         <span
-                          className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                            product.variants?.[0]?.stock == 0
-                              ? "bg-red-100 text-red-600" 
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                            product.variants?.[0]?.stock === 0
+                              ? "bg-red-100 text-red-600"
                               : "bg-green-100 text-green-600"
                           }`}
                         >
-                          {product.variants?.[0]?.stock == 0 ? "Out Of Stock" : "In Stock"}
+                          {product.variants?.[0]?.stock === 0
+                            ? "Out Of Stock"
+                            : "In Stock"}
                         </span>
                       </td>
 
                       <td className="rounded-r-2xl px-4 py-4">
                         <div className="flex items-center gap-3">
                           <button
-                            onClick={() => {navigateToEditProduct(product.id)}}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 hover:border-[#DB4444] hover:text-[#DB4444] cursor-pointer">
+                            type="button"
+                            onClick={() => navigateToEditProduct(product.id)}
+                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition hover:border-[#DB4444] hover:text-[#DB4444]"
+                          >
                             <FontAwesomeIcon icon={faPenToSquare} />
                           </button>
 
                           <button
-                            onClick={() => {handleDeleteProduct(product.id)}} 
-                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 hover:border-[#DB4444] hover:text-[#DB4444] cursor-pointer">
+                            type="button"
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition hover:border-red-500 hover:text-red-500"
+                          >
                             <FontAwesomeIcon icon={faTrash} />
                           </button>
                         </div>
@@ -364,7 +377,218 @@ export default function VendorProductsPage() {
                   ))}
                 </tbody>
               </table>
+            </div> */}
 
+            {/* ================================================================
+                Desktop Table
+            ================================================================ */}
+
+            <div className="hidden md:block">
+              <div className="overflow-hidden rounded-2xl border border-gray-200">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+
+                    {/* ==========================================================
+                        Header
+                    ========================================================== */}
+
+                    <thead>
+                      <tr className="border-b border-gray-200 bg-gray-50">
+
+                        <th className="w-[35%] px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          Product
+                        </th>
+
+                        <th className="w-[18%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          Category
+                        </th>
+
+                        <th className="w-[15%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          Price
+                        </th>
+
+                        <th className="w-[12%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          Stock
+                        </th>
+
+                        <th className="w-[12%] px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          Status
+                        </th>
+
+                        <th className="w-[8%] px-5 py-4 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">
+                          Actions
+                        </th>
+
+                      </tr>
+                    </thead>
+
+                    {/* ==========================================================
+                        Body
+                    ========================================================== */}
+
+                    <tbody className="divide-y divide-gray-100">
+
+                      {products.map((product) => {
+
+                        const stock = product.variants?.[0]?.stock ?? 0;
+                        const price = product.variants?.[0]?.price ?? 0;
+
+                        const isOutOfStock = stock === 0;
+
+                        return (
+                          <tr
+                            key={product.id}
+                            className="transition-colors hover:bg-gray-50/60"
+                          >
+
+                            {/* ==================================================
+                                Product
+                            ================================================== */}
+
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-3">
+
+                                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
+
+                                  <Image
+                                    src={getImageUrl(product.thumbnail)}
+                                    alt={product.title}
+                                    fill
+                                    sizes="48px"
+                                    className="object-cover"
+                                    unoptimized
+                                  />
+
+                                </div>
+
+                                <div className="min-w-0">
+
+                                  <h3 className="max-w-65 truncate text-sm font-semibold text-gray-900">
+                                    {product.title}
+                                  </h3>
+
+                                  <p className="mt-1 text-xs text-gray-400">
+                                    #{product.id.split("-")[0]}
+                                  </p>
+
+                                </div>
+
+                              </div>
+                            </td>
+
+                            {/* ==================================================
+                                Category
+                            ================================================== */}
+
+                            <td className="px-4 py-4">
+                              <span className="text-sm text-gray-600">
+                                {product.category?.name || "—"}
+                              </span>
+                            </td>
+
+                            {/* ==================================================
+                                Price
+                            ================================================== */}
+
+                            <td className="px-4 py-4">
+                              <span className="text-sm font-semibold text-gray-900">
+                                ${price}
+                              </span>
+                            </td>
+
+                            {/* ==================================================
+                                Stock
+                            ================================================== */}
+
+                            <td className="px-4 py-4">
+                              <span className="text-sm font-medium text-gray-600">
+                                {stock}
+                              </span>
+                            </td>
+
+                            {/* ==================================================
+                                Status
+                            ================================================== */}
+
+                            <td className="px-4 py-4">
+
+                              <span
+                                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1.5 text-xs font-semibold ${
+                                  isOutOfStock
+                                    ? "border-red-100 bg-red-50 text-red-600"
+                                    : "border-green-100 bg-green-50 text-green-600"
+                                }`}
+                              >
+
+                                <span
+                                  className={`h-1.5 w-1.5 rounded-full ${
+                                    isOutOfStock
+                                      ? "bg-red-500"
+                                      : "bg-green-500"
+                                  }`}
+                                />
+
+                                {isOutOfStock
+                                  ? "Out Of Stock"
+                                  : "In Stock"}
+
+                              </span>
+
+                            </td>
+
+                            {/* ==================================================
+                                Actions
+                            ================================================== */}
+
+                            <td className="px-5 py-4">
+
+                              <div className="flex items-center justify-end gap-1.5">
+
+                                {/* Edit */}
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    navigateToEditProduct(product.id)
+                                  }
+                                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                                  title="Edit product"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faPenToSquare}
+                                    className="text-xs"
+                                  />
+                                </button>
+
+                                {/* Delete */}
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleDeleteProduct(product.id)
+                                  }
+                                  className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                                  title="Delete product"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faTrash}
+                                    className="text-xs"
+                                  />
+                                </button>
+
+                              </div>
+
+                            </td>
+
+                          </tr>
+                        );
+                      })}
+
+                    </tbody>
+
+                  </table>
+                </div>
+              </div>
             </div>
           
           
